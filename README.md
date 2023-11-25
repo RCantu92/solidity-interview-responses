@@ -3,6 +3,7 @@
 These are responses to [RareSkills](https://www.rareskills.io/)' [_140 Solidity Interview Questions_](https://www.rareskills.io/post/solidity-interview-questions).
 
 ## Easy
+
 > 1. What is the difference between `private`, `internal`, `public`, and `external` functions?
 
 `external` functions can only be called externally to the contract in which the function is declared. `public` functions can be called from externally in the contract, as well as in the current contract, and any inheriting contracts. `internal` contracts can be called form within the current contract as well as inheriting contracts, but nothing else. `private` functions can only be called from internally in the current contract. Not externally nor in any inheriting contracts. ([Source](https://docs.soliditylang.org/en/v0.8.23/contracts.html#function-visibility))
@@ -134,3 +135,218 @@ The `uint256` max value can be obtained with `type(uint256).max;` which is `1157
 > 31. What is variable and fixed interest rate?
 
 A variable interest rate can fluctuate based on changes to index rates, like the prime rate, a fixed interest rate typically doesn’t change throughout the loan term. ([Source](https://www.capitalone.com/learn-grow/money-management/fixed-vs-variable-apr/))
+
+## Medium
+
+> 32. What is the difference between transfer and send? Why should they not be used?
+
+While both `transfer` and `send` send a given amount of Wei to the intended recipient, and forward a 2300 gas stipend, they differ in that `transfer` reverts on failure and `send` returns `false` on failure.
+
+However, it is recommend that they both not be used anymore, and instead contracts opt to use `call`. That is because gas costs can change over time such as the case of a contract's `fallback` now use more than the previous 2300 gas. That is the same amount that `transfer` and `send` forward. (Sources: [one](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#members-of-address-types), [two](https://consensys.io/diligence/blog/2019/09/stop-using-soliditys-transfer-now/))
+
+> 33. How do you write a gas-efficient for loop in Solidity?
+
+Some examples of how to write a more gas-efficient `for` loop are:
+- Cache the length of the array
+- increment the iterator (e.g. `i`) by using `++i`
+- If using solidity prior to [0.8.22](https://soliditylang.org/blog/2023/10/25/solidity-0.8.22-release-announcement/), you could wrap the act of incrementing the iterator in `unchecked { ... }`
+
+([Source](https://solidity-by-example.org/gas-golf/))
+
+> 34. What is a storage collision in a proxy contract?
+
+For example, ff the proxy contract has a variable stored at a specific storage slot, and the implementation contract has a _different_ variable stored in the same slot inside of itself, that could cause a storage collision. Because when the implementation is executing the logic, if it were to reference that variable in the same slot, because it is executing in the context of the proxy, and can alter the proxy's variable unexpectedly. ([Source](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#unstructured-storage-proxies))
+
+> 35. What is the difference between abi.encode and abi.encodePacked?
+
+`abi.encode` will ABI-encode the given arguments, while padding them to 32 bytes, while `abi.encodePacked` does **NOT** pad the arguments to 32 bytes. ([Source](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#abi-encoding-and-decoding-functions))
+
+> 36. uint8, uint32, uint64, uint128, uint256 are all valid uint sizes. Are there others?
+
+Besides the `uint16` that was missed, there are numerous more `uint` sizes. ([Source](https://docs.soliditylang.org/en/v0.8.23/grammar.html#a4.SolidityLexer.UnsignedIntegerType))
+
+> 37. What changed with block.timestamp before and after proof of stake?
+
+`block.timestamp` is the current block timestamp as seconds since unix epoch. However, after _The Merge_ and Ethereum's transition to Proof of Stake, the time for slots, which have blocks inside of them, increases in 12 second increments automatically. This make it much less suceptible to be manipulated by validators, as opposed to miner in Proof of Work. ([Source](https://www.blocknative.com/blog/ethereum-merge-proof-of-stake))
+
+> 38. What is frontrunning?
+
+Frontrunning is when an entity copies a transaction from the mempool and bribes the block producer with a higher gas fee to get their transaction included ahead of the original transaction. ([Source](https://www.alchemy.com/overviews/what-is-mev#:~:text=Frontrunning%20is%20when%20an%20entity,ahead%20of%20the%20original%20transaction.))
+
+> 39. What is a commit-reveal scheme and when would you use it?
+
+A _commit-reveal scheme_ is a way to circumvent the ability for someone's data to be copied by someone. For example, if you have a game where people are attempting to submit answers, the first players would be at a disadvantage because the other players can see the outcome of their submissions. A commit-reveal scheme could help in this scenario.
+
+How it would do so, if you would have the players submit a _hash_ of their responses. Then after everyone has submitted, people could then provide their actual responses to be hashed, then have their hashes be compared with their initially supplied hashes to prove that they didn't change their answer after the fact. ([Source](https://www.gitcoin.co/blog/commit-reveal-scheme-on-ethereum))
+
+> 40. Under what circumstances could abi.encodePacked create a vulnerability?
+
+`abi.encodePacked` can result in hash collisions when passing more than one dynamic data type because it does not pad the arguments like `abi.encode` does. (Sources: [one](https://swcregistry.io/docs/SWC-133/), [two](https://x.com/bytes032/status/1613456938104233984?s=20))
+
+> 41. How does Ethereum determine the BASEFEE in EIP-1559?
+
+The Base Fee is determined by the Ethereum network rather than being set by end-users looking to transact or miners seeking to validate transactions. The Base Fee targets 50% full blocks and is based upon the contents of the most recent confirmed block. Depending on how full that new block is, the Base Fee is automatically increased or decreased. ([Source](https://www.blocknative.com/blog/eip-1559-fees))
+
+> 42. What is the difference between a cold read and a warm read?
+
+A cold read is when you read a storage variable for the first time, and a warm read is when you read a storage variable that has been read already in the same transaction. For example, if you're reading a storage variable for the first time, that will be a cold read and be expensive relative to a warm read. However, if you then read that variable again in the same transaction, it will now be a warm read, it still being in memory, and cost less gas. ([Source](https://eips.ethereum.org/EIPS/eip-2929#storage-read-changes))
+
+> 43. How does an AMM price assets?
+
+One way that AMMs price assets are through the usage of the _constant product formula_, `x * y = k`. As implied by the name, the product, `k`, will not change relative to its reserve tokens (`x` & `y`) as the two reserve tokens are swapped for one another. This has the effect that large trades, relative to the balance of the pool, will affect the reserves price. ([Source](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works))
+
+> 44. What is a function selector clash in a proxy and how does it happen?
+
+A function selector clash is when the function selector in the data passed into the proxy matches one of the functions implemented in the proxy, and thus would not invoke the proxy's fallback. Seeing as how the fallback houses the `DELEGATECALL` to the implementation contract, such a clash would prevent calling the intended implementation contracts. ([Source](https://medium.com/nomic-foundation-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357))
+
+> 45. What is the effect on gas of making a function payable?
+
+If you make functions payable, this would be gas efficient because the compiler will not need to confirm `CALLVALUE` is zero. ([Source](https://www.rareskills.io/post/gas-optimization#viewer-18pd1))
+
+> 46. What is a signature replay attack?
+
+A signature replay attack is when a transaction is executed after already been executed once. This is due to reusing the digital signature of the already-used transaction. A specific type of signature replay attack, the _cross-chain_ replay attack could be prevent by proper use of a chain id. A _same-chain_ replay attack could be prevented by the usage of the account's nonce. (Sources: [one](https://slowmist.medium.com/intro-to-smart-contract-security-audit-signature-replay-b71c23910629), [two](https://solidity-by-example.org/hacks/signature-replay/))
+
+> 47. What is gas griefing?
+
+Gas griefing is when a contract that makes an external call to another contract does not check the return state of the externally called contract. Thus, an exploiter could submit transactions that do not provide sufficient gas for the external contract call. Then, since the return is not checked, the called contract does not know the external called did not actually compute. ([Source](https://scsfg.io/hackers/griefing/))
+
+> 48. How would you design a game of rock-paper-scissors in a smart contract such that players cannot cheat?
+
+A simple implementation that could be done for _rock-paper-scissors_ is to implement a game using the _commit-reveal_ scheme. With that in place, the players would not know what other players submitted until after all players have submitted. (See answer 39)
+
+> 49. What is the free memory pointer and where is it stored?
+
+The free memory pointer is simply a pointer to the location where free memory starts. It ensures smart contracts keep track of which memory locations have been written to and which haven’t. The free memory pointer is located in memory at byte `0x40`. ([Source](https://noxx.substack.com/p/evm-deep-dives-the-path-to-shadowy-d6b#%C2%A7free-memory-pointer))
+
+> 50. What function modifiers are valid for interfaces?
+
+All declared functions must be `external` in the interface, even if they are `public` in the contract.. ([Source](https://docs.soliditylang.org/en/stable/contracts.html#interfaces))
+
+> 51. What is the difference between memory and calldata in a function argument?
+
+memory and calldata are both temporary data storage locations in Solidity, but they have important differences. Memory is used to hold temporary variables during function execution, while Calldata is used to hold function arguments passed in from an external caller. Calldata is read-only and cannot be modified by the function, while Memory can be modified. If you need to modify function arguments that are stored in calldata, you must first copy them into memory.
+([Source](https://docs.alchemy.com/docs/what-is-the-difference-between-memory-and-calldata-in-solidity))
+
+> 52. Describe the three types of storage gas costs.
+
+The three types of storage are storage, memory, and the stack. Storage is by far the most expensive, because it cost a lot of gas to store data in the chain long term. Memory is the second most expensive one and costly the larger it grows (it scales quadratically). Lastly, stack is the least expensive of the three. ([Source](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#storage-memory-and-the-stack))
+
+> 53. Why shouldn’t upgradeable contracts use the constructor?
+
+In Solidity, code that is inside a constructor or part of a global variable declaration is not part of a deployed contract’s runtime bytecode. This code is executed only once, when the contract instance is deployed. As a consequence of this, the code within a logic contract’s constructor will never be executed in the context of the proxy’s state. To rephrase, proxies are completely oblivious to the existence of constructors. It’s simply as if they weren’t there for the proxy.
+([Source](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat))
+
+> 54. What is the difference between UUPS and the Transparent Upgradeable Proxy pattern?
+
+The transparent proxy pattern is where function calls initiated by the end user (caller) are always routed to the logic contract rather than the proxy contract. However, if the caller is an admin of the proxy, the proxy will know to invoke its own administrative function.
+
+The Universal Upgradable Proxy Standard (UUPS) was proposed in `EIP1822` as a way to create a standard for proxy contracts that have universal compatibility with all contracts. It overcomes the issue of proxy function selector clashes. In UUPS, the upgrades are handled by the logic contract—specifically the “proxiable” smart contract that the logic contract inherits from.
+
+([Source](https://blog.chain.link/upgradable-smart-contracts/))
+
+> 55. If a contract delegatecalls an empty address or an implementation that was previously self-destructed, what happens? What if it is a regular call instead of a delegatecall?
+
+When Contract A attempts to make a `DELEGATECALL` (or regular `CALL`) to Contract B, and Contract B has previously executed a self-destruct, the delegatecall will return a success. That is because the two opcodes return success as `true` for calls to accounts with no code. ([Source](https://www.evm.codes/?fork=shanghai))
+
+> 56. What danger do ERC777 tokens pose?
+
+They pose a danger of potential reentrancy. That is because of the implementation of the optional _pre-transfer hooks_. This hook hands control flow over to the sender, which can lead to the exploitation of reentrancy vulnerabilities. ([Source](https://medium.com/immunefi/the-potential-impact-of-erc-777-tokens-on-defi-protocols-51cdb07be733))
+
+> 57. According to the solidity style guide, how should functions be ordered?
+
+Functions should be grouped according to their visibility and ordered:
+- constructor
+- receive function (if exists)
+- fallback function (if exists)
+- external
+- public
+- internal
+- private
+
+Within a grouping, place the `view` and `pure` functions last.
+
+([Source](https://docs.soliditylang.org/en/stable/style-guide.html#order-of-functions))
+
+> 58. According to the solidity style guide, how should function modifiers be ordered?
+
+The modifier order for a function should be:
+- Visibility
+- Mutability
+- Virtual
+- Override
+- Custom modifiers
+
+([Source](https://docs.soliditylang.org/en/stable/style-guide.html#function-declaration))
+
+> 59. What is a bonding curve?
+
+A bonding curve is a mathematical function that connects the supply of a digital asset with its value. By implementing a bonding curve formula, the price of a newly issued token changes in response to changes in the token’s supply (as it is bought or sold) (Sources: [one](https://www.linumlabs.com/articles/bonding-curves-the-what-why-and-shapes-behind-it), [two](https://hackernoon.com/what-is-a-bonding-curve-and-how-does-it-affect-token-price))
+
+> 60. How does safeMint differ from mint in the OpenZeppelin ERC721 implementation?
+
+`mint` mints `tokenId` and transfers it to `to`. `safeMint` mints `tokenId`, transfers it to `to` and checks for `to` acceptance, specifically the implementation of `IERC721Receiver.onERC721Received`. (Sources: [one](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721), [two](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#IERC721Receiver-onERC721Received-address-address-uint256-bytes-))
+
+> 61. What keywords are provided in Solidity to measure time?
+
+Suffixes like `seconds`, `minutes`, `hours`, `days` and `weeks` after literal numbers can be used to specify units of time where seconds are the base unit. ([Source](https://docs.soliditylang.org/en/stable/units-and-global-variables.html#time-units))
+
+> 62. What is a sandwich attack?
+
+A sandwich attack consists of two rapid swaps surrounding a victim’s trade. It begins with an innocent trader sending their order to the public mempool, at which point the bot — always searching — spots its opportunity. 
+
+The attack begins with a frontrun, followed up by an attack on the backend of the selected trade, hence the term “sandwich.” ([Source](https://blockworks.co/news/sandwich-attack-mev-ethereum))
+
+> 63. If a delegatecall is made to a function that reverts, what does the delegatecall do?
+
+`success` returns `0` if the sub context reverted. ([Source](https://www.evm.codes/?fork=shanghai))
+
+> 64. What is a gas efficient alternative to multiplying and dividing by a multiple of two?
+
+In Solidity, it is often more gas efficient to multiply or divide numbers that are powers of two by shifting their bits, rather than using the multiplication or division operators.
+([Source](https://www.rareskills.io/post/gas-optimization#viewer-cvebl))
+
+> 65. How large a uint can be packed with an address in one slot?
+
+From the idea of "slot packing", multiple variables can be packed into a single 32-byte storage slot if combined they take up 32 bytes or less. Seeing as how an address is 20 bytes, that leaves 12 bytes (or 96 bits) left for a `uint96` uint to be packed along with it. ([Source](https://noxx.substack.com/p/evm-deep-dives-the-path-to-shadowy-3ea))
+
+> 66. Which operations give a partial refund of gas?
+
+Setting a storage value to zero refunds you some gas as that key value no longer needs to be stored by the nodes on the network. (Sources: [one](https://noxx.substack.com/p/evm-deep-dives-the-path-to-shadowy-3ea), [two]())
+
+> 67. What is ERC165 used for?
+
+ERC-165 is used to confirm a specific contract supports a specific interface. This is to ensure a specific function is found in the contract before attempting to invoke it. (Sources: [one](https://medium.com/@chiqing/ethereum-standard-erc165-explained-63b54ca0d273), [two](https://docs.openzeppelin.com/contracts/5.x/utilities#introspection))
+
+> 68. If a proxy makes a delegatecall to A, and A does address(this).balance, whose balance is returned, the proxy's or A?
+
+If a proxy makes a `DELEGATECALL` to contract _A_, and _A_ uses `address(this).balance`, the balance of the **proxy** is returned. ([Source](https://www.evm.codes/?fork=shanghai))
+
+> 69. What is a slippage parameter useful for?
+
+Slippage tolerances establish a margin of change acceptable to the user beyond price impact. As long as the execution price is within the slippage range, e.g., %1, the transaction will be executed. If the execution price ends up outside of the accepted slippage range, the transaction will fail, and the swap will not occur. ([Source](https://docs.uniswap.org/concepts/protocol/swaps#slippage))
+
+> 70. What does ERC721A do to reduce mint costs? What is the tradeoff?
+
+Azuki, as part of their implementation of `ERC-721A`, implemented three optimizations. One, they removed the "redundant" storage of a token's metadata and other storge, partyly because their tokens are sequentially numbered. Two, updating the owner’s balance once per batch mint request, instead of per minted NFT. Three, updating the owner data once per batch mint request, instead of per minted NFT. ([Source](https://www.azuki.com/erc721a))
+
+> 71. Why doesn't Solidity support floating point arithmetic?
+
+Solidity doesn't support floating point arithmetic because it itself doesn't support floating-point or fixed-point data types. This can cause unexpected behavior in the smart contract functionality, such as rounding errors or arithmetic overflow and underflow conditions that can manifest itself through a huge loss of funds. ([Source](https://docs.compound.finance/interest-rates/#get-utilization))
+
+> 72. What is TWAP?
+
+_TWAP_, or time weighted average price, is constructed by reading the cumulative price from an ERC20 token pair at the beginning and at the end of the desired interval. The difference in this cumulative price can then be divided by the length of the interval to create a TWAP for that period. ([Source](https://docs.uniswap.org/contracts/v2/concepts/core-concepts/oracles))
+
+> 73. How does Compound Finance calculate utilization?
+
+The formula for producing the protocol utilization of the base asset is:
+```
+Utilization = TotalBorrows / TotalSupply
+```
+
+([Source](https://docs.compound.finance/interest-rates/#get-utilization))
+
+> 74. If a delegatecall is made to a function that reads from an immutable variable, what will the value be?
+
+The value will be the value of the `immutable` variable since its value is in the implementation contract's bytecode, rather in a storage slot. ([Source](https://docs.soliditylang.org/en/stable/contracts.html#constant-and-immutable-state-variables))
