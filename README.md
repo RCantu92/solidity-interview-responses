@@ -589,4 +589,115 @@ When a contract calls another via the `CALL`, `DELEGATECALL`, and `STATICCALL` o
 
 > 116. What addresses do the ethereum precompiles live at?
 
-The precompiled contracts are at addresses 0x01 through 0x09. ([Source](https://www.evm.codes/precompiled?fork=shanghai))
+The precompiled contracts are at addresses `0x01` through `0x0a`. It is worth noting that different EVM-compatible chains may use a different set of precompile addresses. Additionally, new precompile addresses can be added to Ethereum, but you could expect them to be range of `0x01` and `0xffff`. 
+
+Sources:
+- Solidity docs - [_Precompiled Contracts_](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#precompiled-contracts)
+
+> 117. How does Solidity manage the function selectors when there are more than 4 functions?
+
+The EVM manages function selectors when there are four or less by linear search. The EVM when looking for the function selector uses a jump table, searching for the called function. The function selectors are search in order of their hexadecimal value. However, this changes if there are more than four functions, as the EVM will instead use binary search to find the correct called function by its function selector.
+
+Sources:
+- RareSkills - [_Understanding the Function Selector in Solidity_](https://www.rareskills.io/post/gas-optimization#viewer-248d5)
+
+> 118. If a delegatecall is made to a contract that makes a delegatecall to another contract, who is msg.sender in the proxy, the first contract, and the second contract?
+
+> 119. How does ABI encoding vary between calldata and memory, if at all?
+
+
+
+> 120. What is the difference between how a uint64 and uint256 are abi-encoded in calldata?
+
+> 121. What is read-only reentrancy?
+
+Sources:
+- RareSkills - [_Book of Solidity Gas Optimization - 14. Heavily used functions should have optimal names_](https://www.rareskills.io/post/where-to-find-solidity-reentrancy-attacks)
+
+- Inspex - [_Cross-Contract Reentrancy Attack_](https://inspexco.medium.com/cross-contract-reentrancy-attack-402d27a02a15)
+
+> 122. What are the security considerations of reading a (memory) bytes array from an untrusted smart contract call?
+
+Sources:
+- RareSkills - [_Smart Contract Security_](https://www.rareskills.io/post/smart-contract-security)
+    - Note: Under "Gas Griefing or Denial of Service".
+
+> 123. If you deploy an empty Solidity contract, what bytecode will be present on the blockchain, if any?
+
+If you were to deploy an empty Solidity contract, the bytecode that will be present on the blockchain would be the contract creation code's init code portion and the contract's metadata from the contract's runtime code.
+
+This is the bytecode onchain for the contract [0xda0cfF9743468707b2a52375B4fDBd67d6439EBb](https://amoy.polygonscan.com/address/0xda0cfF9743468707b2a52375B4fDBd67d6439EBb#code) deployed on Polygon Amoy.
+
+```
+0x60806040525f80fdfea2646970667358221220ca7b41606a4eb1be94708cb3e416f4fcd91fa20869fe46d3cd080174e061ecc564736f6c63430008190033
+```
+
+Sources:
+
+- RareSkills:
+    - [_Ethereum smart contract creation code_](https://www.rareskills.io/post/ethereum-contract-creation-code)
+    - [_Understanding smart contract metadata_](https://www.rareskills.io/post/solidity-metadata)
+
+> 124. How does the EVM price memory usage?
+
+Sources:
+- evm.codes - [_Memory Expansion_](https://www.evm.codes/about#memoryexpansion)
+
+> 125. What is stored in the metadata section of a smart contract?
+
+Sources:
+
+- RareSkills:
+    - [_Understanding smart contract metadata_](https://www.rareskills.io/post/solidity-metadata)
+
+> 126. What is the uncle-block attack from an MEV perspective?
+
+> 127. How do you conduct a signature malleability attack?
+
+Sources:
+- RareSkills - [_Smart Contract Security_](https://www.rareskills.io/post/smart-contract-security)
+    - Note: Under "Signature Malleability".
+
+> 128. Under what circumstances do addresses with leading zeros save gas and why?
+
+Sources:
+- RareSkills - [_Book of Solidity Gas Optimization - 14. Heavily used functions should have optimal names_](https://www.rareskills.io/post/gas-optimization#viewer-248d5)
+- jeffreyscholz - [_solidity-zero-finder-rust_](https://github.com/jeffreyscholz/solidity-zero-finder-rust)
+
+> 129. What is the difference between payable(msg.sender).call{value: value}(””) and msg.sender.call{value: value}(””)?
+
+> 130. How many storage slots does a string take up?
+
+> 131. How does the --via-ir functionality in the Solidity compiler work?
+
+> 132. Are function modifiers called from right to left or left to right, or is it non-deterministic?
+
+> 133. If you do a delegatecall to a contract and the opcode CODESIZE executes, which contract size will be returned?
+
+> 134. Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
+
+> 135. Describe how symbolic manipulation testing works.
+
+> 136. What is the most efficient way to copy regions of memory?
+
+> 137. How can you validate on-chain that another smart contract emitted an event, without using an oracle?
+
+> 138. When selfdestruct is called, at what point is the Ether transferred? At what point is the smart contract's bytecode erased?
+
+> 139. Under what conditions does the Openzeppelin Proxy.sol overwrite the free memory pointer? Why is it safe to do this?
+
+> 140. Why did Solidity deprecate the "years" keyword?
+
+> 141. What does the verbatim keyword do, and where can it be used?
+
+> 142. How much gas can be forwarded in a call to another smart contract?
+
+> 143. What does an int256 variable that stores -1 look like in hex?
+
+> 144. What is the use of the signextend opcode?
+
+> 145. Why do negative numbers in calldata cost more gas?
+
+> 146. What is a zk-friendly hash function and how does it differ from a non-zk-friendly hash function?
+
+> 147. What is a nullifier in the context of zero knowledge, and what is it used for?
