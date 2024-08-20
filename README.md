@@ -763,6 +763,8 @@ Sources:
 
 > 134. Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
 
+TODO
+
 > 135. Describe how symbolic manipulation testing works.
 
 Symbolic execution is a program analysis technique which explores multiple execution paths at the same time. If a program is run concretely, i.e., on a specific concrete input, a single control flow path of this program is explored—that is what happens during the execution of a unit test.
