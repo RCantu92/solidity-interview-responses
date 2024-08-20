@@ -603,20 +603,52 @@ Sources:
 
 > 118. If a delegatecall is made to a contract that makes a delegatecall to another contract, who is msg.sender in the proxy, the first contract, and the second contract?
 
+In this scenario, there would be three contracts:
+
+1. the proxy
+2. the first contract
+3. the second contract
+
+With the proxy being called by the EOA initiating the transaction. If a `DELEGATECALL` is made from the proxy to the first contract, that then makes a `DELEGATECALL` to the second contract, the `msg.sender` in the proxy is the initiating EOA. The `msg.sender` in the first contract, which was invoked by `DELEGATECALL` from the proxy, its `msg.sender` would also be the initiating contract. Lastly, the `msg.sender` of the second contract, which would have been `DELEGATECALL` from the first contract would also be the initiating EOA. That is because the first contract would pass its context to the first contract, since that was via `DELEGATECALL`. Then the first contract would also `DELEGATECALL` the second contract, passing the first contract's context, which is actually the context of the proxy.
+
+In essence, the context of the proxy would be passed to both the first _and_ second contract, and thus the `msg.sender` would remain the initiating EOA. Here is an example transaction on Polygon Amoy of this exact setup, which verified contract to see the exact implementation: [0x53da07aa18d7b4aeb1a63ae87a8e89474d7df878e085fe4d031816ed8cb59b27](https://amoy.polygonscan.com/tx/0x53da07aa18d7b4aeb1a63ae87a8e89474d7df878e085fe4d031816ed8cb59b27).
+
+Sources:
+- EVM Codes - [_DELEGATECALL_](https://www.evm.codes/#f4?fork=cancun)
+
 > 119. How does ABI encoding vary between calldata and memory, if at all?
 
+ABI encoding between `calldata` and `memory` does not vary.
+
+Sources:
+- Solidity docs - [_Contract ABI Specification_](https://docs.soliditylang.org/en/v0.8.26/abi-spec.html)
 
 
 > 120. What is the difference between how a uint64 and uint256 are abi-encoded in calldata?
 
+The difference between how a `uint64` and `uint256` are ABI encoded is the padding used to fill 32 bytes in the calldata. Since `uint256` would naturally fit in 32 bytes, it won't require any padding with leading zeros. However, `uint64` would be padded with leading zeros for the remainder 24 bytes, since it naturally only needs 8 bytes of calldata.
+
+Sources:
+- Solidity docs:
+    - [_Layout of Call Data_](https://docs.soliditylang.org/en/v0.8.26/internals/layout_in_calldata.html)
+    - [_Formal Specification of the Encoding_](https://docs.soliditylang.org/en/v0.8.26/abi-spec.html#formal-specification-of-the-encoding)
+
 > 121. What is read-only reentrancy?
+
+Read-only reentrancy is a reentrancy scenario where a view function is reentered which in most cases is unguarded as it does not modify the contract’s state. However, if the state is inconsistent, wrong values could be reported. Other protocols relying on a return value, can be tricked into reading the wrong state to perform unwanted actions.
 
 Sources:
 - RareSkills - [_Book of Solidity Gas Optimization - 14. Heavily used functions should have optimal names_](https://www.rareskills.io/post/where-to-find-solidity-reentrancy-attacks)
 
-- Inspex - [_Cross-Contract Reentrancy Attack_](https://inspexco.medium.com/cross-contract-reentrancy-attack-402d27a02a15)
+- ChainSecurity - [_Curve LP Oracle Manipulation: Post Mortem_](https://www.chainsecurity.com/blog/curve-lp-oracle-manipulation-post-mortem)
+
+- OfficerCIA - [_Read-only Reentrancy: In-Depth_](https://officercia.mirror.xyz/DBzFiDuxmDOTQEbfXhvLdK0DXVpKu1Nkurk0Cqk3QKc)
 
 > 122. What are the security considerations of reading a (memory) bytes array from an untrusted smart contract call?
+
+The security consideration about reading into a memory a returned bytes array from an untrusted smart contract call is that it could use a lot of gas, and thus not allowing the transaction to complete. Memory arrays use up quadratic amount of gas after 724 bytes, so a carefully chosen return data size can grief the caller.
+
+Even if the variable result is not used, it is still copied to memory. If you want to restrict the return size to a certain amount, you can use assembly.
 
 Sources:
 - RareSkills - [_Smart Contract Security_](https://www.rareskills.io/post/smart-contract-security)
@@ -640,25 +672,49 @@ Sources:
 
 > 124. How does the EVM price memory usage?
 
+Some EVM opcodes have the functionality of accessing memory during execution. You would have to pay for the access to memory as you access more memory offsets (32 byte slots), which is referred to as expansion. As access to memory keeps expanding, the cost to access higher memory slots grows quadratically. This discentivizes the overuse of memory.
+
 Sources:
 - evm.codes - [_Memory Expansion_](https://www.evm.codes/about#memoryexpansion)
 
 > 125. What is stored in the metadata section of a smart contract?
 
-Sources:
+What is stored in a smart contract's metadata is the IPFS hash and the Solidity compiler version.
 
+Sources:
 - RareSkills:
     - [_Understanding smart contract metadata_](https://www.rareskills.io/post/solidity-metadata)
 
 > 126. What is the uncle-block attack from an MEV perspective?
 
+An uncle block attack from an MEV perspective is when an opportunity for MEV to occur is included in an uncle block, but not on a canonical block, and thus could still be valid.
+
+An example of this, was an MEV Searcher sees an opportunity to sandwich attack a user attempting to make a large buy on a Uniswap trading pair. The Searcher submits a Flashbots bundle with the Uniswap user's buy, and frontruns it with a buy of their own on the same pool, inflating the price. The user's buy goes through a higher price, and make the price even higher. Then the Searcher backruns their transaction with a sell, taking advantage of the higher price.
+
+However, what could then happen, is the Searcher's bundle could be included in an uncle block instead of a canonical block. A second Searcher, Searcher2, could then submit their own bundle and take advantage of the first Searcher's buy. Searcher2's bundle would include Searcher1's buy, then include a buy for the same token in another DEX, where the price wasn't affected, and sell it in the same pool Searcher2 bought from.
+
+Sources:
+- Alchemy - [_What are Uncle Blocks_](https://docs.alchemy.com/docs/what-are-uncle-blocks)
+- Elan Halpern (Alchemy) - [_Unmasking the Ethereum Uncle Bandit_](https://medium.com/alchemy-api/unmasking-the-ethereum-uncle-bandit-a2b3eb694019)
+
 > 127. How do you conduct a signature malleability attack?
+
+A signature malleability attack refers to the ability of an attacker to alter a digital signature in a way that changes the signature itself without affecting the validity of the signed message.
+
+Ethereum transactions are signed using the Elliptic Curve Digital Signature Algorithm (ECDSA). The signature consists of two values: `r` and `s`. The malleability arises because, for a given `r`, there are two possible valid values of `s` that can produce a valid signature. Specifically, if (`r`, `s`) is a valid signature, then (`r`, `-s mod n`) is also a valid signature. Here, `n` is the order of the elliptic curve.
+
+In a malleability attack, an attacker can take a valid signature (`r`, `s`) and convert it into another valid signature (`r`, `-s mod n`). You would also need to invert the `v` value from `27` to `28`, or vice versa. Although both signatures are valid, they are different.
+
+To prevent this, a protocol can enforce that the `s` value in the signature must be in the lower half of the curve order (`0 < s < n/2`). This effectively eliminates the possibility of creating a second valid signature by flipping the s value, thus preventing malleability.
 
 Sources:
 - RareSkills - [_Smart Contract Security_](https://www.rareskills.io/post/smart-contract-security)
     - Note: Under "Signature Malleability".
+- ImmuneBytes - [_Signature Malleability Attacks in Blockchain_](https://www.immunebytes.com/blog/signature-malleability-attacks-in-blockchain/)
 
 > 128. Under what circumstances do addresses with leading zeros save gas and why?
+
+Addresses with leading zeroes save gas because it saves gas cost when they are found in calldata. That is because Ethereum charges 4 gas for a zero byte of calldata and 16 gas for a non-zero byte.
 
 Sources:
 - RareSkills - [_Book of Solidity Gas Optimization - 14. Heavily used functions should have optimal names_](https://www.rareskills.io/post/gas-optimization#viewer-248d5)
@@ -666,38 +722,156 @@ Sources:
 
 > 129. What is the difference between payable(msg.sender).call{value: value}(””) and msg.sender.call{value: value}(””)?
 
+There is no difference between `payable(msg.sender).call{value: value}(””)` and `msg.sender.call{value: value}(””)` because the usage of `.call`. `.call` is available to all addresses, regardless of whether they are `payable` or not. However, if one were attemting to use `.transfer()` or `.send()` on an `address` type, then that `address` _has_ to be `payable(address)`.
+
+Sources:
+- Solidity docs:
+    - [_Members of Address Types_](https://docs.soliditylang.org/en/v0.8.25/units-and-global-variables.html#members-of-address-types)
+    - [_Address_](https://docs.soliditylang.org/en/v0.8.25/types.html#address)
+
 > 130. How many storage slots does a string take up?
+
+The encoding is similar to `bytes1[]`, in the sense that there is a slot for the array itself and a data area that is computed using a `keccak256` hash of that slot’s position. However, for short values (shorter than 32 bytes) the array elements are stored together with the length in the same slot.
+
+Sources:
+- Solidity docs - [_bytes and string_](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html#bytes-and-string)
 
 > 131. How does the --via-ir functionality in the Solidity compiler work?
 
+Solidity can generate EVM bytecode in two different ways: Either directly from Solidity to EVM opcodes (“old codegen”) or through an intermediate representation (“IR”) in Yul (“new codegen” or “IR-based codegen”).
+
+The IR-based code generator was introduced with an aim to not only allow code generation to be more transparent and auditable but also to enable more powerful optimization passes that span across functions.
+
+Sources:
+- Solidity docs - [_Solidity IR-based Codegen Changes_](https://docs.soliditylang.org/en/v0.8.26/ir-breaking-changes.html)
+
 > 132. Are function modifiers called from right to left or left to right, or is it non-deterministic?
 
+Modifiers are applied to a function by specifying them in a whitespace-separated list and are evaluated in the order presented, i.e. left to right.
+
+Sources:
+- Solidity docs - [_Function Modifiers_](https://docs.soliditylang.org/en/v0.8.26/contracts.html#function-modifiers)
+
 > 133. If you do a delegatecall to a contract and the opcode CODESIZE executes, which contract size will be returned?
+
+If you `DELEGATECALL` a contract and the opcode `CODESIZE` executes, the size of the calling contracts will be returned because `CODESIZE` returns the size of current context, which with `DELEGATECALL` remains being the calling contract.
+
+Sources:
+- EVM.codes:
+    - [_CODESIZE_](https://www.evm.codes/#38?fork=cancun)
+    - [_DELEGATECALL_](https://www.evm.codes/#f4?fork=cancun)
 
 > 134. Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
 
 > 135. Describe how symbolic manipulation testing works.
 
+Symbolic execution is a program analysis technique which explores multiple execution paths at the same time. If a program is run concretely, i.e., on a specific concrete input, a single control flow path of this program is explored—that is what happens during the execution of a unit test.
+
+Similarly, fuzzing concretely executes a program on a set of random (yet, concrete) inputs. In contrast to these techniques, symbolic execution assigns symbolic—rather than concrete—values to input variables that determine which paths should be be executed. A symbolic value represents an arbitrary value that can be assigned to a variable; in other words, a symbolic value means that a variable can take any value that a variable of its type can have (modulo constraints imposed on this variable by the program code leading to the current execution point).
+
+Sources:
+- SaferMaker - [_Everything You Wanted to Know About Symbolic Execution for Ethereum Smart Contracts (But Were Afraid to Ask)_](https://hackmd.io/@SaferMaker/EVM-Sym-Exec)
+- Olympix - [_Unveiling Hidden Threats: Symbolic Execution for Smart Contract Security_](https://olympixai.medium.com/unveiling-hidden-threats-symbolic-execution-for-smart-contract-security-a6a7dffcb448)
+
 > 136. What is the most efficient way to copy regions of memory?
+
+The most efficient way to copy regions of memory is with the opcode added in the Dencun Ethereum update: `MCOPY`. The purpose of MCOPY is to improve the performance of memory copying and assist in a more efficient means of building data structures. Previously, if a developer needs to copy memory their best option is to reference both MSTORE and MLOAD.
+
+Sources:
+- ConsenSys - [_Ethereum Evolved: Dencun Upgrade Part 1, EIP-5656 & EIP-6780_](Ethereum Evolved: Dencun Upgrade Part 1, EIP-5656 & EIP-6780)
 
 > 137. How can you validate on-chain that another smart contract emitted an event, without using an oracle?
 
+You are unable to validate on-chain that another smart contract emitted an event without an oracle because you can also listen to these event emissions through the RPC interface of an Ethereum client. Per the Solidity docs, "The [event] Log and its event data is not accessible from within contracts (not even from the contract that created them)".
+
+Sources:
+- Solidity docs - [_Events_](https://docs.soliditylang.org/en/v0.8.26/contracts.html#events)
+
 > 138. When selfdestruct is called, at what point is the Ether transferred? At what point is the smart contract's bytecode erased?
+
+From the Cancun updrade and forward, `SELFDESTRUCT` will no longer erase a a contract's bytecode, it will only send the Ether to the target contract. Prior to the Cancun upgrade, the Ether is transferred first before the smart contract's bytecode is erased.
+
+However, if `SELFDESTRUCT` occurs in the contract's creation transactio, its functionlity is the same as that of the implementation prior to the Cancun upgrade.
+
+Sources:
+- Solidity docs - [_Deactivate and Self-destruct_](https://docs.soliditylang.org/en/v0.8.26/introduction-to-smart-contracts.html#deactivate-and-self-destruct)
 
 > 139. Under what conditions does the Openzeppelin Proxy.sol overwrite the free memory pointer? Why is it safe to do this?
 
+The conditions under which OpenZeppelin's `Proxy.sol` overwrites the free memory point is that the execution of `DELEGATECALL` to the implemention contract won't have further Solidity code executing in the proxy contract, as noted by their [comment](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/Proxy.sol#L24-L26) in the code. This is why it is safe to do so.
+
+Sources:
+- OpenZeppelin:
+    - [_Proxy Patterns_](https://blog.openzeppelin.com/proxy-patterns)
+    - [_Proxy Upgrade Pattern_](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#proxy-forwarding)
+
 > 140. Why did Solidity deprecate the "years" keyword?
+
+The unit denomination `years` was disallowed due to complications and confusion about leap years.
+
+Sources:
+- Solidity docs - [_Literals and Suffixes_](https://docs.soliditylang.org/en/v0.8.26/050-breaking-changes.html#literals-and-suffixes)
 
 > 141. What does the verbatim keyword do, and where can it be used?
 
+The set of `verbatim...` builtin functions lets you create bytecode for opcodes that are not known to the Yul compiler. It also allows you to create bytecode sequences that will not be modified by the optimizer.
+
+The functions are `verbatim_<n>i_<m>o("<data>", ...)`, where
+- `n` is a decimal between 0 and 99 that specifies the number of input stack slots / variables
+- `m` is a decimal between 0 and 99 that specifies the number of output stack slots / variables
+- `data` is a string literal that contains the sequence of bytes
+
+If you for example want to define a function that multiplies the input by two, without the optimizer touching the constant two, you can use:
+```
+let x := calldataload(0)
+let double := verbatim_1i_1o(hex"600202", x)
+```
+
+It will multiply by two because the opcode `60` (`PUSH1`) will push the byte of `02`, and multiply `02` by `x`, per the `02` opcode (`MUL`).
+
+Sources:
+- Solidity docs - [_verbatim_](https://docs.soliditylang.org/en/v0.8.26/yul.html#verbatim)
+
 > 142. How much gas can be forwarded in a call to another smart contract?
+
+The amount of gas that can be forwarded in a call to another smart contract is 63/64. This was introduced in EIP-150 to prevent the execution of a _Call Depth Attack_, which is when, prior to the 63/64 limit, contract could increase the stack depth until 1023, then execute the intended call, which would silently error out since the stack was too deep. With the introduction of the 63/64 gas forward limit, increasing the stack with a similar attempt would have the remaining gas avaialable decrease signficantly.
+
+Sources:
+- Solidity docs - [_Message Calls_](https://docs.soliditylang.org/en/v0.8.25/introduction-to-smart-contracts.html#message-calls)
+- RareSkills - [_EIP-150 and the 63/64 Rule for Gas_](https://www.rareskills.io/post/eip-150-and-the-63-64-rule-for-gas)
 
 > 143. What does an int256 variable that stores -1 look like in hex?
 
+An `int256` that stores `-1` in hex would look like `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`. Because solidity stores number using two's complement, when wanting to get the two's complement of a number, you invert the bits and add one to the result. Since `1` would be `0x0000000000000000000000000000000000000000000000000000000000000001`, you would invert the bits, when written in binary, and add one, giving you `0xFFFF...FFFF`.
+
+Sources:
+- Solidity docs:
+    - [_Two’s Complement / Underflows / Overflows_](https://docs.soliditylang.org/en/v0.8.26/security-considerations.html#two-s-complement-underflows-overflows)
+    - [_Cleaning Up Variables_](https://docs.soliditylang.org/en/v0.8.26/internals/variable_cleanup.html)
+- RareSkills - [_Solidity Signed Integer_](https://www.rareskills.io/post/signed-int-solidity)
+- Cornell - [_Two's Complement_](https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html)
+
 > 144. What is the use of the signextend opcode?
+
+A signed integer smaller than 256 bits will have leading zeros. However, Two’s Complement negative numbers always start with the leftmost bit at `1`. Therefore, if a Two’s Complement integer is upcasted to a larger type, the value will change from negative to positive since the leftmost bits will be `0`. `SIGNEXTEND` handles this transition seamlessly.
+
+Sources:
+- EVM Codes - [_SIGNEXTEND_](https://www.evm.codes/#0b?fork=cancun)
+- Cornell - [_Two's Complement_](https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html)
 
 > 145. Why do negative numbers in calldata cost more gas?
 
+Negative numbers cost more gas in the calldata because of Two's Complement, they are represented in bits as the inverse of `0`s. That's because 
+Ethereum charges 4 gas for a zero byte of calldata and 16 gas for a non-zero byte.
+
+Sources:
+- RareSkills - [_The RareSkills Book of Solidity Gas Optimization: 80+ Tips_](https://www.rareskills.io/post/gas-optimization)
+    - Note: Under "Use vanity addresses (safely!)"
+
 > 146. What is a zk-friendly hash function and how does it differ from a non-zk-friendly hash function?
 
+TODO
+
 > 147. What is a nullifier in the context of zero knowledge, and what is it used for?
+
+TODO
