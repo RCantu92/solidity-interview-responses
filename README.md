@@ -763,7 +763,11 @@ Sources:
 
 > 134. Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
 
-TODO
+It is important to ECDSA sign a hash rather than an arbitrary `bytes32` because it is possible to craft signatures that recover to arbitrary addresses for non-hashed data. Hashing them also confirms that it is the correct length, to increase security. 
+
+Sources:
+- OpenZeppelin - [_ECDSA_](https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA)
+    - [Github](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.5/contracts/utils/cryptography/ECDSA.sol#L43-L47)
 
 > 135. Describe how symbolic manipulation testing works.
 
