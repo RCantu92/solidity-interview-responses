@@ -1,6 +1,6 @@
 # Solidity Interview Questions
 
-These are responses to [RareSkills](https://www.rareskills.io/)' [_140 Solidity Interview Questions_](https://www.rareskills.io/post/solidity-interview-questions).
+These are responses to [RareSkills](https://www.rareskills.io/)' [_Over 150 Interview Questions for Ethereum Developer_](https://www.rareskills.io/post/solidity-interview-questions).
 
 ## Easy
 
@@ -26,9 +26,9 @@ In Solidity `0.8.0`, the native feature of underflow/overflow protection was int
 
 The special "call" opcode that is needed for proxies to work is `DELEGATECALL`. The `DELEGATE` call allows a proxy to receive a _call_ and _delegate_ it to an implementation contract. On a technical level, how this works, this call allows the function call to execution the logic of the implementation contract in the context of the proxy contract. (Sources: [one](https://www.evm.codes/#f0?fork=shanghai), [two](https://blog.openzeppelin.com/blog/proxy-patterns))
 
-> 6. Prior to EIP-1559, how do you calculate the dollar cost of an Ethereum transaction?
+> 6. How do you calculate the dollar cost of an Ethereum transaction?
 
-EVM opcodes cost gas to execute, and to execute a transaction on-chain, a user would have to pay for all of the individual opcodes that would be executed in their transaction. The sum of all the gas required by the opcodes would be have a use has to pay in gas. To find the dollar cost of a transaction, you would then multiply that amount of gas fees by the price of ETH at the time of execution. ([Source](https://www.blocknative.com/blog/eth-gas-101))
+TODO
 
 > 7. What are the challenges of creating a random number on the blockchain?
 
@@ -40,7 +40,7 @@ An English auction is an open-outcry ascending dynamic auction. Different from o
 
 In contracts, a Dutch auction is an auction in which the auctioneer begins with a high asking price in the case of selling, and lowers it until some participant accepts the price, or it reaches a predetermined reserve price. (Sources: [one](https://en.wikipedia.org/wiki/English_auction), [two](https://en.wikipedia.org/wiki/Dutch_auction))
 
-> 9. What is the difference between transfer and transferFrom in ERC20?
+> 9. What is the difference between `transfer` and `transferFrom` in ERC20?
 
 `transfer` allows the owner of said ERC20 tokens to be transferred, while `transferFrom` allows both the owner _and_ an account to which the owner has authorized (via `approve`) to do so as well. This commonly used to authorize DeFi apps to transfer tokens on an owner's behalf. ([Source](https://eips.ethereum.org/EIPS/eip-20))
 
@@ -48,7 +48,7 @@ In contracts, a Dutch auction is an auction in which the auctioneer begins with 
 
 For gas efficiency reasons, that would be a `mapping`. That is because if it were to be implemented using an array, if at some point, the array needed to be iterated upon, that would utilized a lot of gas. As opposed to a mapping, which would require no iterating. ([Source](https://docs.alchemy.com/docs/how-to-create-an-on-chain-nft-allowlist))
 
-> 11. Why shouldn’t tx.origin be used for authentication?
+> 11. Why shouldn’t `tx.origin` be used for authentication?
 
 `tx.origin` shouldn't be used for origin because it can fall susceptible to "man in the middle" attacks. That is because `tx.origin` will equal the EOA that initiated the transaction. For example, an app that uses `tx.origin` for authentication could be exploited by an entity who gets a legitimate account to be the `tx.origin`, then add some logic in the "middle" that is exploitative in nature. (Sources: [one](https://github.com/ethereumbook/ethereumbook/blob/develop/09smart-contracts-security.asciidoc#txorigin-authentication), [two](https://secureum.substack.com/p/security-pitfalls-and-best-practices-101))
 
@@ -64,7 +64,7 @@ Ethereum primarily uses `keccak256` for hashing. ([Source](https://github.com/et
 
 1 wei of Ether is 10^-18 ([Source](https://etherscan.io/unitconverter))
 
-> 15. What is the difference between assert and require?
+> 15. What is the difference between `assert` and `require`?
 
 `assert` should only be used to test for internal errors, and to check invariants. Also, `assert` creates an error of type `Panic(uint256)`.
 
@@ -82,7 +82,7 @@ The _Checks-Effects-Interactions_ patterns is such that in a function logic, che
 
 To run a solo staking node, you need 32 ETH. ([Source](https://www.blocknative.com/blog/ethereum-validator-staking-guide))
 
-> 19. What is the difference between fallback and receive?
+> 19. What is the difference between `fallback` and `receive`?
 
 `receive` is the function that is executed when a contract is called with empty `calldata` and is executed on plain Ether transfers. Additionally, it can only rely on `2300` gas being available.
 
@@ -92,47 +92,43 @@ To run a solo staking node, you need 32 ETH. ([Source](https://www.blocknative.c
 
 Reentrancy is when a contract is invoked, and as part of its logic, it calls a seperate contract. The seperate contract can then, as part of _its_ logic, call back into the initial (first) contract. And depending on the logic of the first contract, could be exploited by the one reentering. ([Source](https://www.alchemy.com/overviews/reentrancy-attack-solidity))
 
-> 21. As of the Shanghai upgrade, what is the gas limit per block?
-
-As of the Shanghai upgrade, and today 18 November 2023, the block gas limit is ~30 million. ([Source](https://etherscan.io/chart/gaslimit))
-
-> 22. What prevents infinite loops from running forever?
+> 21. What prevents infinite loops from running forever?
 
 Each opcode that is carried out as part of a transaction execution consumes some gas, therefore, it is impossible for infinite loops from running forever because the transaction would either reach the user's gas limit, and if not, the block's gas limit. ([Source](https://github.com/ethereumbook/ethereumbook/blob/develop/01what-is.asciidoc#implications-of-turing-completeness))
 
-> 23. What is the difference between tx.origin and msg.sender?
+> 22. What is the difference between `tx.origin` and `msg.sender`?
 
 `msg.sender` is the sender of the current call, while `tx.origin` is the account that initiated the transaction. ([Source](https://docs.soliditylang.org/en/v0.8.23/cheatsheet.html#block-and-transaction-properties))
 
-> 24. How do you send Ether to a contract that does not have payable functions, or a receive or fallback?
+> 23. How do you send Ether to a contract that does not have payable functions, or a receive or fallback?
 
 A contract without a `receive` Ether function can receive Ether as a recipient of a _coinbase transaction_ or as a destination of a `SELFDESTRUCT`. ([Source](https://docs.soliditylang.org/en/v0.8.23/contracts.html#receive-ether-function))
 
-> 25. What is the difference between view and pure?
+> 24. What is the difference between `view` and `pure`?
 
 `view` functions promise not to modify the state. `pure` functions promise not to read from or modify the state. ([Source](https://docs.soliditylang.org/en/v0.8.23/contracts.html#state-mutability))
 
-> 26. What is the difference between transferFrom and safeTransferFrom in ERC721?
+> 25. What is the difference between `transferFrom` and `safeTransferFrom` in ERC721?
 
 With `safeTransferFrom`, when the transfer is complete, it checks if the recipient is a smart contract (code size > 0). If so, it calls `onERC721Received` on the recipient and throws if the return value is not `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`. This is a check to confirm that it is equipped to receive NFTs. `transferFrom` does not have this check. ([Source](https://eips.ethereum.org/EIPS/eip-721))
 
-> 27. How can an ERC1155 token be made into a non-fungible token?
+> 26. How can an ERC1155 token be made into a non-fungible token?
 
 With `ERC1155`, each `tokenId` can have its own `supply`. Therefore, to have a non-fungible token (NFT), it would need to have a `supply` of one. ([Source](https://eips.ethereum.org/EIPS/eip-1155))
 
-> 28. What is access control and why is it important?
+> 27. What is access control and why is it important?
 
 Smart contracts are public, anyone can see and call the code. So it becomes fundamental that contracts implement secure and reliable access controls. These controls must be robust enough to prevent unauthorized accounts from executing sensitive functions, while at the same time, flexible enough to mutate and evolve as new features are added. ([Source](https://blog.openzeppelin.com/blog/workshop-recap-secure-development-workshop-2))
 
-> 29. What does a modifier do?
+> 28. What does a modifier do?
 
 Modifiers can be used to change the behavior of functions in a declarative way. For example, you can use a modifier to automatically check a condition prior to executing the function. ([Source](https://docs.soliditylang.org/en/v0.8.23/contracts.html#function-modifiers))
 
-> 30. What is the largest value a uint256 can store?
+> 29. What is the largest value a uint256 can store?
 
 The `uint256` max value can be obtained with `type(uint256).max;` which is `115792089237316195423570985008687907853269984665640564039457584007913129639935` or `2^256-1`. ([Source](https://www.rareskills.io/post/uint-max-value-solidity))
 
-> 31. What is variable and fixed interest rate?
+> 30. What is variable and fixed interest rate?
 
 A variable interest rate can fluctuate based on changes to index rates, like the prime rate, a fixed interest rate typically doesn’t change throughout the loan term. ([Source](https://www.capitalone.com/learn-grow/money-management/fixed-vs-variable-apr/))
 
@@ -140,106 +136,94 @@ A variable interest rate can fluctuate based on changes to index rates, like the
 ## Medium
 
 
-> 32. What is the difference between transfer and send? Why should they not be used?
+> 31. What is the difference between transfer and send? Why should they not be used?
 
 While both `transfer` and `send` send a given amount of Wei to the intended recipient, and forward a 2300 gas stipend, they differ in that `transfer` reverts on failure and `send` returns `false` on failure.
 
 However, it is recommend that they both not be used anymore, and instead contracts opt to use `call`. That is because gas costs can change over time such as the case of a contract's `fallback` now use more than the previous 2300 gas. That is the same amount that `transfer` and `send` forward. (Sources: [one](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#members-of-address-types), [two](https://consensys.io/diligence/blog/2019/09/stop-using-soliditys-transfer-now/))
 
-> 33. How do you write a gas-efficient for loop in Solidity?
-
-Some examples of how to write a more gas-efficient `for` loop are:
-- Cache the length of the array
-- increment the iterator (e.g. `i`) by using `++i`
-- If using solidity prior to [0.8.22](https://soliditylang.org/blog/2023/10/25/solidity-0.8.22-release-announcement/), you could wrap the act of incrementing the iterator in `unchecked { ... }`
-
-([Source](https://solidity-by-example.org/gas-golf/))
-
-> 34. What is a storage collision in a proxy contract?
+> 32. What is a storage collision in a proxy contract?
 
 For example, ff the proxy contract has a variable stored at a specific storage slot, and the implementation contract has a _different_ variable stored in the same slot inside of itself, that could cause a storage collision. Because when the implementation is executing the logic, if it were to reference that variable in the same slot, because it is executing in the context of the proxy, and can alter the proxy's variable unexpectedly. ([Source](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#unstructured-storage-proxies))
 
-> 35. What is the difference between abi.encode and abi.encodePacked?
+> 33. What is the difference between `abi.encode` and `abi.encodePacked`?
 
 `abi.encode` will ABI-encode the given arguments, while padding them to 32 bytes, while `abi.encodePacked` does **NOT** pad the arguments to 32 bytes. ([Source](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#abi-encoding-and-decoding-functions))
 
-> 36. uint8, uint32, uint64, uint128, uint256 are all valid uint sizes. Are there others?
+> 34. `uint8`, `uint32`, `uint64`, `uint128`, `uint256` are all valid uint sizes. Are there others?
 
 Besides the `uint16` that was missed, there are numerous more `uint` sizes. ([Source](https://docs.soliditylang.org/en/v0.8.23/grammar.html#a4.SolidityLexer.UnsignedIntegerType))
 
-> 37. What changed with block.timestamp before and after proof of stake?
+> 35. What changed with block.timestamp before and after proof of stake?
 
 `block.timestamp` is the current block timestamp as seconds since unix epoch. However, after _The Merge_ and Ethereum's transition to Proof of Stake, the time for slots, which have blocks inside of them, increases in 12 second increments automatically. This make it much less suceptible to be manipulated by validators, as opposed to miner in Proof of Work. ([Source](https://www.blocknative.com/blog/ethereum-merge-proof-of-stake))
 
-> 38. What is frontrunning?
+> 36. What is frontrunning?
 
 Frontrunning is when an entity copies a transaction from the mempool and bribes the block producer with a higher gas fee to get their transaction included ahead of the original transaction. ([Source](https://www.alchemy.com/overviews/what-is-mev#:~:text=Frontrunning%20is%20when%20an%20entity,ahead%20of%20the%20original%20transaction.))
 
-> 39. What is a commit-reveal scheme and when would you use it?
+> 37. What is a commit-reveal scheme and when would you use it?
 
 A _commit-reveal scheme_ is a way to circumvent the ability for someone's data to be copied by someone. For example, if you have a game where people are attempting to submit answers, the first players would be at a disadvantage because the other players can see the outcome of their submissions. A commit-reveal scheme could help in this scenario.
 
 How it would do so, if you would have the players submit a _hash_ of their responses. Then after everyone has submitted, people could then provide their actual responses to be hashed, then have their hashes be compared with their initially supplied hashes to prove that they didn't change their answer after the fact. ([Source](https://www.gitcoin.co/blog/commit-reveal-scheme-on-ethereum))
 
-> 40. Under what circumstances could abi.encodePacked create a vulnerability?
+> 38. Under what circumstances could `abi.encodePacked` create a vulnerability?
 
 `abi.encodePacked` can result in hash collisions when passing more than one dynamic data type because it does not pad the arguments like `abi.encode` does. (Sources: [one](https://swcregistry.io/docs/SWC-133/), [two](https://x.com/bytes032/status/1613456938104233984?s=20))
 
-> 41. How does Ethereum determine the BASEFEE in EIP-1559?
+> 39. How does Ethereum determine the BASEFEE in EIP-1559?
 
 The Base Fee is determined by the Ethereum network rather than being set by end-users looking to transact or miners seeking to validate transactions. The Base Fee targets 50% full blocks and is based upon the contents of the most recent confirmed block. Depending on how full that new block is, the Base Fee is automatically increased or decreased. ([Source](https://www.blocknative.com/blog/eip-1559-fees))
 
-> 42. What is the difference between a cold read and a warm read?
+> 40. What is the difference between a cold read and a warm read?
 
 A cold read is when you read a storage variable for the first time, and a warm read is when you read a storage variable that has been read already in the same transaction. For example, if you're reading a storage variable for the first time, that will be a cold read and be expensive relative to a warm read. However, if you then read that variable again in the same transaction, it will now be a warm read, it still being in memory, and cost less gas. ([Source](https://eips.ethereum.org/EIPS/eip-2929#storage-read-changes))
 
-> 43. How does an AMM price assets?
+> 41. How does an AMM price assets?
 
 One way that AMMs price assets are through the usage of the _constant product formula_, `x * y = k`. As implied by the name, the product, `k`, will not change relative to its reserve tokens (`x` & `y`) as the two reserve tokens are swapped for one another. This has the effect that large trades, relative to the balance of the pool, will affect the reserves price. ([Source](https://docs.uniswap.org/contracts/v2/concepts/protocol-overview/how-uniswap-works))
 
-> 44. What is a function selector clash in a proxy and how does it happen?
+> 42. What is a function selector clash in a proxy and how does it happen?
 
 A function selector clash is when the function selector in the data passed into the proxy matches one of the functions implemented in the proxy, and thus would not invoke the proxy's fallback. Seeing as how the fallback houses the `DELEGATECALL` to the implementation contract, such a clash would prevent calling the intended implementation contracts. ([Source](https://medium.com/nomic-foundation-blog/malicious-backdoors-in-ethereum-proxies-62629adf3357))
 
-> 45. What is the effect on gas of making a function payable?
+> 43. What is the effect on gas of making a function `payable`?
 
 If you make functions payable, this would be gas efficient because the compiler will not need to confirm `CALLVALUE` is zero. ([Source](https://www.rareskills.io/post/gas-optimization#viewer-18pd1))
 
-> 46. What is a signature replay attack?
+> 44. What is a signature replay attack?
 
 A signature replay attack is when a transaction is executed after already been executed once. This is due to reusing the digital signature of the already-used transaction. A specific type of signature replay attack, the _cross-chain_ replay attack could be prevent by proper use of a chain id. A _same-chain_ replay attack could be prevented by the usage of the account's nonce. (Sources: [one](https://slowmist.medium.com/intro-to-smart-contract-security-audit-signature-replay-b71c23910629), [two](https://solidity-by-example.org/hacks/signature-replay/))
 
-> 47. What is gas griefing?
-
-Gas griefing is when a contract that makes an external call to another contract does not check the return state of the externally called contract. Thus, an exploiter could submit transactions that do not provide sufficient gas for the external contract call. Then, since the return is not checked, the called contract does not know the external called did not actually compute. ([Source](https://scsfg.io/hackers/griefing/))
-
-> 48. How would you design a game of rock-paper-scissors in a smart contract such that players cannot cheat?
+> 45. How would you design a game of rock-paper-scissors in a smart contract such that players cannot cheat?
 
 A simple implementation that could be done for _rock-paper-scissors_ is to implement a game using the _commit-reveal_ scheme. With that in place, the players would not know what other players submitted until after all players have submitted. (See answer 39)
 
-> 49. What is the free memory pointer and where is it stored?
+> 46. What is the free memory pointer and where is it stored?
 
 The free memory pointer is simply a pointer to the location where free memory starts. It ensures smart contracts keep track of which memory locations have been written to and which haven’t. The free memory pointer is located in memory at byte `0x40`. ([Source](https://noxx.substack.com/p/evm-deep-dives-the-path-to-shadowy-d6b#%C2%A7free-memory-pointer))
 
-> 50. What function modifiers are valid for interfaces?
+> 47. What function modifiers are valid for interfaces?
 
 All declared functions must be `external` in the interface, even if they are `public` in the contract.. ([Source](https://docs.soliditylang.org/en/stable/contracts.html#interfaces))
 
-> 51. What is the difference between memory and calldata in a function argument?
+> 48. What is the difference between memory and calldata in a function argument?
 
 memory and calldata are both temporary data storage locations in Solidity, but they have important differences. Memory is used to hold temporary variables during function execution, while Calldata is used to hold function arguments passed in from an external caller. Calldata is read-only and cannot be modified by the function, while Memory can be modified. If you need to modify function arguments that are stored in calldata, you must first copy them into memory.
 ([Source](https://docs.alchemy.com/docs/what-is-the-difference-between-memory-and-calldata-in-solidity))
 
-> 52. Describe the three types of storage gas costs.
+> 49. Describe the three types of storage gas costs for writes.
 
+TODO - added "for writes". See if changes are needed.
 The three types of storage are storage, memory, and the stack. Storage is by far the most expensive, because it cost a lot of gas to store data in the chain long term. Memory is the second most expensive one and costly the larger it grows (it scales quadratically). Lastly, stack is the least expensive of the three. ([Source](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#storage-memory-and-the-stack))
 
-> 53. Why shouldn’t upgradeable contracts use the constructor?
+> 50. Why shouldn’t upgradeable contracts use the constructor?
 
 In Solidity, code that is inside a constructor or part of a global variable declaration is not part of a deployed contract’s runtime bytecode. This code is executed only once, when the contract instance is deployed. As a consequence of this, the code within a logic contract’s constructor will never be executed in the context of the proxy’s state. To rephrase, proxies are completely oblivious to the existence of constructors. It’s simply as if they weren’t there for the proxy.
 ([Source](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#the-constructor-caveat))
 
-> 54. What is the difference between UUPS and the Transparent Upgradeable Proxy pattern?
+> 51. What is the difference between UUPS and the Transparent Upgradeable Proxy pattern?
 
 The transparent proxy pattern is where function calls initiated by the end user (caller) are always routed to the logic contract rather than the proxy contract. However, if the caller is an admin of the proxy, the proxy will know to invoke its own administrative function.
 
@@ -247,15 +231,16 @@ The Universal Upgradable Proxy Standard (UUPS) was proposed in `EIP1822` as a wa
 
 ([Source](https://blog.chain.link/upgradable-smart-contracts/))
 
-> 55. If a contract delegatecalls an empty address or an implementation that was previously self-destructed, what happens? What if it is a regular call instead of a delegatecall?
+> 52. If a contract delegatecalls an empty address or an implementation that was previously self-destructed, what happens? What if it is a low-level call instead of a delegatecall?
 
+TODO - changed "regular call" to "low-level call". See if changes needed.
 When Contract A attempts to make a `DELEGATECALL` (or regular `CALL`) to Contract B, and Contract B has previously executed a self-destruct, the delegatecall will return a success. That is because the two opcodes return success as `true` for calls to accounts with no code. ([Source](https://www.evm.codes/?fork=shanghai))
 
-> 56. What danger do ERC777 tokens pose?
+> 53. What danger do ERC777 tokens pose?
 
 They pose a danger of potential reentrancy. That is because of the implementation of the optional _pre-transfer hooks_. This hook hands control flow over to the sender, which can lead to the exploitation of reentrancy vulnerabilities. ([Source](https://medium.com/immunefi/the-potential-impact-of-erc-777-tokens-on-defi-protocols-51cdb07be733))
 
-> 57. According to the solidity style guide, how should functions be ordered?
+> 54. According to the solidity style guide, how should functions be ordered?
 
 Functions should be grouped according to their visibility and ordered:
 - constructor
@@ -270,7 +255,7 @@ Within a grouping, place the `view` and `pure` functions last.
 
 ([Source](https://docs.soliditylang.org/en/stable/style-guide.html#order-of-functions))
 
-> 58. According to the solidity style guide, how should function modifiers be ordered?
+> 55. According to the solidity style guide, how should function modifiers be ordered?
 
 The modifier order for a function should be:
 - Visibility
@@ -281,66 +266,67 @@ The modifier order for a function should be:
 
 ([Source](https://docs.soliditylang.org/en/stable/style-guide.html#function-declaration))
 
-> 59. What is a bonding curve?
+> 56. What is a bonding curve?
 
 A bonding curve is a mathematical function that connects the supply of a digital asset with its value. By implementing a bonding curve formula, the price of a newly issued token changes in response to changes in the token’s supply (as it is bought or sold) (Sources: [one](https://www.linumlabs.com/articles/bonding-curves-the-what-why-and-shapes-behind-it), [two](https://hackernoon.com/what-is-a-bonding-curve-and-how-does-it-affect-token-price))
 
-> 60. How does safeMint differ from mint in the OpenZeppelin ERC721 implementation?
+> 57. How does `_safeMint` differ from `_mint` in the OpenZeppelin ERC721 implementation?
 
+TODO - Changed `safeMint` and `mint` to `_safeMint` and `_mint`. See if changes needed.
 `mint` mints `tokenId` and transfers it to `to`. `safeMint` mints `tokenId`, transfers it to `to` and checks for `to` acceptance, specifically the implementation of `IERC721Receiver.onERC721Received`. (Sources: [one](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#ERC721), [two](https://docs.openzeppelin.com/contracts/5.x/api/token/erc721#IERC721Receiver-onERC721Received-address-address-uint256-bytes-))
 
-> 61. What keywords are provided in Solidity to measure time?
+> 58. What keywords are provided in Solidity to measure time?
 
 Suffixes like `seconds`, `minutes`, `hours`, `days` and `weeks` after literal numbers can be used to specify units of time where seconds are the base unit. ([Source](https://docs.soliditylang.org/en/stable/units-and-global-variables.html#time-units))
 
-> 62. What is a sandwich attack?
+> 59. What is a sandwich attack?
 
 A sandwich attack consists of two rapid swaps surrounding a victim’s trade. It begins with an innocent trader sending their order to the public mempool, at which point the bot — always searching — spots its opportunity. 
 
 The attack begins with a frontrun, followed up by an attack on the backend of the selected trade, hence the term “sandwich.” ([Source](https://blockworks.co/news/sandwich-attack-mev-ethereum))
 
-> 63. If a delegatecall is made to a function that reverts, what does the delegatecall do?
+> 60. If a delegatecall is made to a function that reverts, what does the delegatecall do?
 
 `success` returns `0` if the sub context reverted. ([Source](https://www.evm.codes/?fork=shanghai))
 
-> 64. What is a gas efficient alternative to multiplying and dividing by a multiple of two?
+> 61. What is a gas efficient alternative to multiplying and dividing by a multiple of two?
 
 In Solidity, it is often more gas efficient to multiply or divide numbers that are powers of two by shifting their bits, rather than using the multiplication or division operators.
 ([Source](https://www.rareskills.io/post/gas-optimization#viewer-cvebl))
 
-> 65. How large a uint can be packed with an address in one slot?
+> 62. How large a uint can be packed with an address in one slot?
 
 From the idea of "slot packing", multiple variables can be packed into a single 32-byte storage slot if combined they take up 32 bytes or less. Seeing as how an address is 20 bytes, that leaves 12 bytes (or 96 bits) left for a `uint96` uint to be packed along with it. ([Source](https://noxx.substack.com/p/evm-deep-dives-the-path-to-shadowy-3ea))
 
-> 66. Which operations give a partial refund of gas?
+> 63. Which operations give a partial refund of gas?
 
 Setting a storage value to zero refunds you some gas as that key value no longer needs to be stored by the nodes on the network. (Sources: [one](https://noxx.substack.com/p/evm-deep-dives-the-path-to-shadowy-3ea), [two]())
 
-> 67. What is ERC165 used for?
+> 64. What is ERC165 used for?
 
 ERC-165 is used to confirm a specific contract supports a specific interface. This is to ensure a specific function is found in the contract before attempting to invoke it. (Sources: [one](https://medium.com/@chiqing/ethereum-standard-erc165-explained-63b54ca0d273), [two](https://docs.openzeppelin.com/contracts/5.x/utilities#introspection))
 
-> 68. If a proxy makes a delegatecall to A, and A does address(this).balance, whose balance is returned, the proxy's or A?
+> 65. If a proxy makes a delegatecall to A, and A does address(this).balance, whose balance is returned, the proxy's or A?
 
 If a proxy makes a `DELEGATECALL` to contract _A_, and _A_ uses `address(this).balance`, the balance of the **proxy** is returned. ([Source](https://www.evm.codes/?fork=shanghai))
 
-> 69. What is a slippage parameter useful for?
+> 66. What is a slippage parameter useful for?
 
 Slippage tolerances establish a margin of change acceptable to the user beyond price impact. As long as the execution price is within the slippage range, e.g., %1, the transaction will be executed. If the execution price ends up outside of the accepted slippage range, the transaction will fail, and the swap will not occur. ([Source](https://docs.uniswap.org/concepts/protocol/swaps#slippage))
 
-> 70. What does ERC721A do to reduce mint costs? What is the tradeoff?
+> 67. What does ERC721A do to reduce mint costs? What is the tradeoff?
 
 Azuki, as part of their implementation of `ERC-721A`, implemented three optimizations. One, they removed the "redundant" storage of a token's metadata and other storge, partyly because their tokens are sequentially numbered. Two, updating the owner’s balance once per batch mint request, instead of per minted NFT. Three, updating the owner data once per batch mint request, instead of per minted NFT. ([Source](https://www.azuki.com/erc721a))
 
-> 71. Why doesn't Solidity support floating point arithmetic?
+> 68. Why doesn't Solidity support floating point arithmetic?
 
 Solidity doesn't support floating point arithmetic because it itself doesn't support floating-point or fixed-point data types. This can cause unexpected behavior in the smart contract functionality, such as rounding errors or arithmetic overflow and underflow conditions that can manifest itself through a huge loss of funds. ([Source](https://docs.compound.finance/interest-rates/#get-utilization))
 
-> 72. What is TWAP?
+> 69. What is TWAP?
 
 _TWAP_, or time weighted average price, is constructed by reading the cumulative price from an ERC20 token pair at the beginning and at the end of the desired interval. The difference in this cumulative price can then be divided by the length of the interval to create a TWAP for that period. ([Source](https://docs.uniswap.org/contracts/v2/concepts/core-concepts/oracles))
 
-> 73. How does Compound Finance calculate utilization?
+> 70. How does Compound Finance calculate utilization?
 
 The formula for producing the protocol utilization of the base asset is:
 ```
@@ -349,67 +335,92 @@ Utilization = TotalBorrows / TotalSupply
 
 ([Source](https://docs.compound.finance/interest-rates/#get-utilization))
 
-> 74. If a delegatecall is made to a function that reads from an immutable variable, what will the value be?
+> 71. If a delegatecall is made to a function that reads from an immutable variable, what will the value be?
 
 The value will be the value of the `immutable` variable since its value is in the implementation contract's bytecode, rather in a storage slot. ([Source](https://docs.soliditylang.org/en/stable/contracts.html#constant-and-immutable-state-variables))
+
+> 72. What is a fee-on-transfer token?
+
+TODO
+
+> 73. What is a rebasing token?
+
+TODO
+
+> 74. In what year will a timestamp stored in a `uint32` overflow?
+
+TODO
+
+> 75. What is LTV in the context of DeFi?
+
+TODO
+
+> 76. What are aTokens and cTokens in the context of Compound Finance and AAVE?
+
+TODO
+
+> 77. Describe how to use a lending protocol to go leveraged long or leveraged short on an asset.
+
+TODO
+
+> 78. What is a perpetual protocol?
+
+TODO
+
 
 
 ## Hard
 
 
-> 75. How does fixed point arithmetic represent numbers?
+> 79. How does fixed point arithmetic represent numbers?
 
 Fixed-point airthmetic represents numbers by allocating a certain amount of bits to the fractional part. For example, Uniswap, in V3, utilizes Q64.95, in `Q` notation, to store their price (there is additional details, but this is enough for illustrative purposes). Their `sqrtPriceX96` is stored as a `uint160` and with `Q64.96` means that the first 64 bits store the integer, and the remaining 96 bits store the fractional part. It is a way to represent floating point numbers in Solidity, since it does not natively support floating point numbers. (Sources: [one](https://blog.uniswap.org/uniswap-v3-math-primer), [two](https://en.wikipedia.org/wiki/Q_(number_format)))
 
-> 76. What is an ERC20 approval frontrunning attack?
+> 80. What is an ERC20 approval frontrunning attack?
 
 An `ERC20` approval frontrunning attack is when address `A` grants address `B` to `transferFrom` `N` amount of tokens via the `approve` function. Then some time later, address `A` sends another `approve` transaction for address `B` to be a new updated amount, `M`. `B` could then see the transaction, before it is included in a block, and send a fronrunning `transferFrom` for `N` amount. Then once the `approve` for `M` is included in a block, could `transferFrom` for `M`. Effectly, via this frontrunning, address `B` would've been able to send both `N` and `M` amount of `ERC20` tokens. ([Source](https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/edit#heading=h.m9fhqynw2xvt))
 
-> 77. What opcode accomplishes address(this).balance?
+> 81. What opcode accomplishes address(this).balance?
 
 The EVM opcode that accomplishes `address(this).balance` is `SELFBALANCE`, which per [evm.codes](https://www.evm.codes/), "[g]et balance of currently executing account". [Source](https://www.ethervm.io/#47)
 
-> 78. How many arguments can a solidity event have?
+> 82. How many arguments can a solidity event have?
 
 For unindexed arguments, you are limited by the stack limit. For indexed arguments, you are limited to three arguments, or four if you declare an `anonymous` event. ([Source](https://www.rareskills.io/post/ethereum-events))
 
-> 79. What is an anonymous Solidity event?
+> 83. What is an anonymous Solidity event?
 
 Anonymous events are those that have no `selector`, but are allowed up to four `indexed` arguments. ([Source](https://www.rareskills.io/post/ethereum-events))
 
-> 80. Under what circumstances can a function receive a mapping as an argument?
+> 84. Under what circumstances can a function receive a mapping as an argument?
 
 They can be used for parameters in library functions. Additionally, they cannot be used as parameters or return parameters of contract functions that are publicly visible. (Sources: [one](https://docs.soliditylang.org/en/v0.8.16/contracts.html#function-parameters), [two](https://docs.soliditylang.org/en/latest/types.html#mapping-types))
 
-> 81. What is an inflation attack in ERC4626
+> 85. What is an inflation attack in ERC4626?
 
 `ERC4626` is the standard that defines token vaults, or vaults whose shares (i.e. `ERC20` tokens) correspond to "shares" (i.e. percentage) of the vault's underlying token, a different asset. An inflation attack on one of the token vaults is when an attacker frontruns and deposits assets to change the relative value of the shares to the underlying asset, then the original user would have their shares devalued because of the sudden influx in assets. (Sources: [one](https://eips.ethereum.org/EIPS/eip-4626), [two](https://www.rareskills.io/post/erc4626), [three](https://www.alchemy.com/overviews/erc-4626))
 
-> 82. How many arguments can a solidity function have?
-
-The EVM is a stack based machine that can only access the top 16 items, theoretically making it so that if you were to make a function with 17 or more parameters, you would get a stack too deep error. ([Source](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#storage-memory-and-the-stack))
-
-> 83. How many storage slots does this use? uint64[] x = [1,2,3,4,5]? Does it differ from memory?
+> 86. How many storage slots does this use? `uint64[] x = [1,2,3,4,5]`? Does it differ from memory?
 
 The array `x`, a fixed-size array with values `[1,2,3,4,5]`, uses two storage slots. While fixed-size arrays use storage slot that are in sequence, which is not the case with dynamic length arrays, `x` uses only two storage slots versus five because each element in the array is of type `uint64`. Since each storage slot in a Solidity smart contract can hold 32-bytes, one storage slot can hold the first four of the elements in `x`. The fifth one would then be in the next slot, for a total of two storage slots ([source](https://programtheblockchain.com/posts/2018/03/09/understanding-ethereum-smart-contract-storage/))
 
-> 84. Prior to the Shanghai upgrade, under what circumstances is returndatasize() more efficient than push zero?
+> 87. Prior to the Shanghai upgrade, under what circumstances is `returndatasize()` more efficient than `PUSH 0`?
 
 Prior to the Shanghai upgrade, `RETURNDATASIZE` was used to push `0` to the stack over `PUSH` because `RETURNDATASIZE` costs 2 gas while `PUSH` operations cost 3 gas. This could be seen implementated in the Minimal Proxy Standard implementation, as seen [here](https://blog.openzeppelin.com/deep-dive-into-the-minimal-proxy-contract). However, in the Shanghai upgrade, there was the addition of a new `PUSH0` opcode that accomplishes the pushing of a `0` to the stack that costs 0 gas. (Sources: [one](https://blog.quicknode.com/the-ethereum-shanghai-upgrade-what-you-need-to-know/), [two](https://eips.ethereum.org/EIPS/eip-3855), [three](https://www.evm.codes/))
 
-> 85. Why does the compiler insert the INVALID op code into Solidity contracts?
+> 88. Why does the compiler insert the INVALID op code into Solidity contracts?
 
 The Solidity compiler adds the `INVALID` op code to Solidity contracts' bytecode to prepend the contract metadata at the end to prevent its execution. This is since the `INVALID` functions very similar to the `REVERT` opcode, with the difference being that `INVALID` consumes all of the transaction gas in addition to halting its execution. (Sources: [one](https://www.rareskills.io/post/solidity-metadata), [two](https://www.rareskills.io/post/ethereum-contract-creation-code), [three](https://eips.ethereum.org/EIPS/eip-141), [four](https://www.evm.codes/#fe?fork=cancun))
 
-> 86. What is the difference between how a custom error and a require with error string is encoded at the EVM level?
+> 89. What is the difference between how a custom error and a require with error string is encoded at the EVM level?
 
 Solidity only stores and returns only the first four bytes of a custom error, while Solidity has to store at least 64 bytes due to the string messages in `require` statements. (Sources: [one](https://www.rareskills.io/post/gas-optimization#viewer-a0fm0))
 
-> 87. What is the kink parameter in the Compound DeFi formula?
+> 90. What is the kink parameter in the Compound DeFi formula?
 
 Compound Finance is a borrowing and lending platform where users can supply digital assets to earn interest, and borrow assets while being charged an interest rate. As such, Compound uses an interest rate model to determine an utilization rate of a given money market. However, Compound also uses a _kink_ in their equation, which is a point that if the utilization rate were to pass, the interest rate increases faster, to act as a deterrent to "slow" down borrowing when liquidity is lower. (Sources: [one](https://docs.compound.finance/interest-rates/#interest-rates), [two](https://ianm.com/posts/2020-12-20-understanding-compound-protocols-interest-rates), [three](https://medium.com/the-quant-journey/defi-credit-lending-compound-cd1a26c561ee))
 
-> 88. How can the name of a function affect its gas cost, if at all?
+> 91. How can the name of a function affect its gas cost, if at all?
 
 There are two ways a function's name in Solidity can affect its gas cost, and they are both related to if the function's selector has leading zeroes.
 
@@ -419,7 +430,7 @@ Second, it is more expensive to handle bytes that are zeroes than non-zero bytes
 
 As an added bonus, it will also make the contract code smaller and save costs on deployment. (Sources: [one](https://www.rareskills.io/post/gas-optimization#viewer-248d5), [two](https://github.com/jeffreyscholz/solidity-zero-finder-rust))
 
-> 89. What is a common vulnerability with ecrecover?
+> 92. What is a common vulnerability with ecrecover?
 
 The common vulnerability with `ercrecover` is that a valid signature can be turned into a different valid signature without requiring knowledge of the corresponding private key. This stems from the fact that the ECDSA that is used in Ethereum is a symmetric Elliptic Curve.
 
@@ -427,7 +438,7 @@ First, it's important to note that to authenticate validity of a signature, you 
 
 (Sources: [one](https://medium.com/immunefi/intro-to-cryptography-and-signatures-in-ethereum-2025b6a4a33d), [two](https://swcregistry.io/docs/SWC-117/), [three](https://docs.soliditylang.org/en/v0.8.23/units-and-global-variables.html#mathematical-and-cryptographic-functions))
 
-> 90. What is the difference between an optimistic rollup and a zk-rollup?
+> 93. What is the difference between an optimistic rollup and a zk-rollup?
 
 Optimistic rollups begin with an "optimistic" assumption, and that is that transactions are valid until proven otherwise. On the other hand, zkRollups transactions are valid to be true by default due to zero-knowledge proofs. 
 
@@ -435,7 +446,7 @@ At a lower level, optimistic rollups have transactions executed off-chain and ar
 
 zk rollups similarly execute transactions off-chain and submit them to the layer one chain via a summary of the state changes of the rollup with a zero knowledge proof to prove their validity. (Sources: [one](https://coinmarketcap.com/academy/article/optimistic-rollups-vs-zk-rollups-the-ultimate-comparison), [two](https://academy.binance.com/en/articles/optimistic-vs-zero-knowledge-rollups-what-s-the-difference), [three](https://chain.link/education-hub/zero-knowledge-rollup))
 
-> 91. How does EIP1967 pick the storage slots, how many are there, and what do they represent?
+> 94. How does EIP1967 pick the storage slots, how many are there, and what do they represent?
 
 `EIP-1967` details three storage slots that on proxy contract that hold special resposibilities. The three slots are those of the implementation, beacon, and admin address. The storage slots are generated as the hash of a string, detailing which slot it is, type casted to the `bytes32` type. The actual implementations for the three are as follows:
 * `bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)` 
@@ -446,19 +457,19 @@ Overall, their purpose is to determine a consistent storage slot to search for e
 
 Most importantly, the main requirement for the storage slots chosen is that they must never be picked by the compiler to store any contract state variable. Otherwise, a logic contract could inadvertently overwrite this information on the proxy when writing to a variable of its own.([Source](https://eips.ethereum.org/EIPS/eip-1967#:~:text=This%20EIP%20proposes%20a%20set,to%20optionally%20act%20upon%20it.))
 
-> 92. How much is one Szabo of ether?
+> 95. How much is one Szabo of ether?
 
 1 Szabo of Ether is 10^-6 ([Source](https://etherscan.io/unitconverter))
 
-> 93. What can delegatecall be used for besides use in a proxy?
+> 96. What can delegatecall be used for besides use in a proxy?
 
 Besides proxies, `DELEGATECALL` is used to make Library types in Solidity function.  (Sources: [one](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#delegatecall-and-libraries))
 
-> 94. Under what circumstances would a smart contract that works on Ethereum not work on Polygon or Optimism? (Assume no dependencies on external contracts)
+> 97. Under what circumstances would a smart contract that works on Ethereum not work on Polygon or Optimism? (Assume no dependencies on external contracts)
 
 A smart contract that works on Ethereum may not work on Polygon or Optimism for things such as certain EVM opcodes not being implemented on the Polygon or on Optimism, and the precompile contracts behaving differently than Ethereum. (Sources: [one](https://eips.ethereum.org/EIPS/eip-3855), [two](https://www.rareskills.io/post/solidity-precompiles))
 
-> 95. How can a smart contract change its bytecode without changing its address?
+> 98. How can a smart contract change its bytecode without changing its address?
 
 A smart contract can change its bytecode if it is what is a called a _metamorphic_ smart contract. This is done by the usage of the `CREATE`, `CREATE2`, and `SELFDESTRUCT` opcodes.
 
@@ -473,11 +484,11 @@ The above could also be altered to have an implmentation contract that the facto
 
 (Sources: [one](https://0age.medium.com/the-promise-and-the-peril-of-metamorphic-contracts-9eb8b8413c5e), [two](https://www.coinbase.com/blog/exploiting-governance-with-metamorphic-proposals), [three](https://a16zcrypto.com/posts/article/metamorphic-smart-contract-detector-tool/))
 
-> 96. What is the danger of putting msg.value inside of a loop?
+> 99. What is the danger of putting msg.value inside of a loop?
 
 The dange of putting `msg.value` inside of a loop is that it will be reused. For example, if you have a `payable` multicall implementation that uses the `msg.value` of the transaction in each call in the loop, the value of `msg.value` will be reused for each call. (Sources: [one](https://samczsun.com/two-rights-might-make-a-wrong/), [two](https://blog.trailofbits.com/2021/12/16/detecting-miso-and-opyns-msg-value-reuse-vulnerability-with-slither/))
 
-> 97. Describe the calldata of a function that takes a dynamic length array of uint128 when uint128[1,2,3,4] is passed as an argument
+> 100. Describe the calldata of a function that takes a dynamic length array of `uint128` when `uint128[1,2,3,4]` is passed as an argument
 
 The call data for a function call to a function that takes `uint128[]` as an argument and passing it `[1,2,3,4]` as the argument would be as follows:
 ```
@@ -496,26 +507,26 @@ At word `[1]` you will find the amount of elements in the array, which in our ca
 
 (Sources: [one](https://docs.soliditylang.org/en/v0.8.26/abi-spec.html#use-of-dynamic-types) | Example txn on Polygon Amoy [here](https://amoy.polygonscan.com/tx/0xdc3778a7f5fcade041f7409efe224ad530f7cf699c6c79a0cc5122fec3d878be))
 
-> 98. Why is strict inequality comparisons more gas efficient than ≤ or ≥? What extra opcode(s) are added?
+> 101. Why is strict inequality comparisons more gas efficient than ≤ or ≥? What extra opcode(s) are added?
 
 Strict inequality comparisons are more gas efficient than `≤` and `≥` because the former has the addition of supplementary `ISZERO` checks. (Sources: [one](https://betterprogramming.pub/solidity-gas-optimizations-and-tricks-2bcee0f9f1f2), [two](https://www.rareskills.io/post/gas-optimization#viewer-7b77t))
 
-> 99. If a proxy calls an implementation, and the implementation self-destructs in the function that gets called, what happens?
+> 102. If a proxy calls an implementation, and the implementation self-destructs in the function that gets called, what happens?
 
 If an implementation contract has logic inside itself that uses `SELFDESTRUCT`, then the calling contract is destroyed. That is why a logic contract should not have the ability to `DELEGATECALL` into another contract, as that external contract could use `SELFDESTRUCT`, which would destroy the calling logic contract. If that logic contract then served as an implementation for a proxy, the proxy would have be trying to make calls to an address that no longer has any code. ([Source](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable#potentially-unsafe-operations))
 
-> 100. What is the relationship between variable scope and stack depth?
+> 103. What is the relationship between variable scope and stack depth?
 
 Similar to question 82 about how many arguments can be passed to a function, you are limited to having 16 local variables, like you are to 16 function arguments. That is because after that point, you will encounter "stack too deep" errors, as you would be exceeding the limit to the EVM stack depth. (Sources: [one](https://medium.com/@simon.palmer_42769/solidity-gotchas-part-4-stack-too-deep-929a0b488730), [two](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#storage-memory-and-the-stack))
 
-> 101. What is an access list transaction?
+> 104. What is an access list transaction?
 
 An Ethereum access list transaction enables saving gas on cross-contract calls by declaring in advance which contract and storage slots will be accessed. Up to 100 gas can be saved per accessed storage slot.
 
 This is implemented client side, and it allows the cold acess cost is paid upfront, rather than with the execution of an `SLOAD`. It informs the node clients ahead of time which storage keys will be accessed ahead of time, lowering the computational overhead.
 (Sources: [one](https://eips.ethereum.org/EIPS/eip-2930), [two](https://www.rareskills.io/post/eip-2930-optional-access-list-ethereum))
 
-> 102. How can you halt an execution with the mload opcode?
+> 105. How can you halt an execution with the mload opcode?
 
 The `MLOAD` opcode can error, or halt execution, for two reasons. That would be for two reasons: running out of gas or not enough values in the stack.
 
@@ -523,35 +534,35 @@ The first, running out of gas, would be the reason behind something like a gas g
 
 The second would be there not being enough elements on the stack. If there is not an element on the stack for an `MLOAD` to pop off, then the execution would error out with a "stack underflow" error. (Sources: [one](https://www.evm.codes/#51?fork=cancun), [two](https://www.evm.codes/about#memoryexpansion), [three](https://blog.tenderly.co/how-to-debug-common-smart-contract-errors/))
 
-> 103. What is a beacon in the context of proxies?
+> 106. What is a beacon in the context of proxies?
 
 The Beacon proxy pattern allows multiple proxy contracts to share one logic implementation by referencing the beacon contract. The beacon contract provides the logic implementation contract address to calling proxies and only the beacon contract needs to be updated when upgrading with a new logic implementation address. (Sources: [one](https://eips.ethereum.org/EIPS/eip-1967#:~:text=This%20EIP%20proposes%20a%20set,to%20optionally%20act%20upon%20it.), [two](https://www.certik.com/resources/blog/FnfYrOCsy3MG9s9gixfbJ-upgradeable-proxy-contract-security-best-practices))
 
-> 104. Why is it necessary to take a snapshot of balances before conducting a governance vote?
+> 107. Why is it necessary to take a snapshot of balances before conducting a governance vote?
 
 It is necessary to take a snapshot of token balances before a governance vote because users could vote, transfer their tokens to another account, and vote again, essentially re-using their tokens to cast multiple votes. (Sources: [one](https://www.rareskills.io/post/erc20-snapshot))
 
-> 105. How can a transaction be executed without a user paying for gas?
+> 108. How can a transaction be executed without a user paying for gas?
 
 The way a transaction can be executed without the end user paying for gas is by way of meta transactions. How they work is that a user signs a transaction then submits to a relayer/forwarder. This relayer then validates the transaction to be sent and submits it to the target contract. The target contract would also have to have the functionality to properly process meta transactions. (Sources: [one](https://www.alchemy.com/overviews/meta-transactions), [two](https://moralis.io/what-are-meta-transactions-exploring-erc-2771/))
 
-> 106. In solidity, without assembly, how do you get the function selector of the calldata?
+> 109. In solidity, without assembly, how do you get the function selector of the calldata?
 
 To get the function selector of the calldata, which would be only the first four bytes in the calldata, you could use the `msg.sig` transaction property. External and public functions can have their function selectors retrieved with the `.selector` member of the `function` type. (Sources: [one](https://docs.soliditylang.org/en/v0.8.26/units-and-global-variables.html#block-and-transaction-properties), [two](https://docs.soliditylang.org/en/latest/types.html#function-types), [three](https://www.rareskills.io/post/function-selector))
 
-> 107. How is an Ethereum address derived?
+> 110. How is an Ethereum address derived?
 
 There are two types of addresses in Ethereum: externally owned accounts (EOAs) and contract accounts. The creation of addresses for contracts is details in the response to question ninety-five. EOAs on the other hand, are generated from the right-most 160 bits of a Keccak hash of an ECDSA public key. ([Source](https://info.etherscan.com/what-is-an-ethereum-address/))
 
-> 108. What is the metaproxy standard?
+> 111. What is the metaproxy standard?
 
 The MetaProxy standard, ERC-3448, can be thought of as an extension of the minimal proxy standard (i.e. "clone"), ERC-1167. The MetaProxy standard allows creating smart contract clones with an added unique immutable metadata for each of the clones. This unique metadata will be encoded and appended to the end of the clone's bytecode. (Sources: [one](https://eips.ethereum.org/EIPS/eip-3448), [two](https://www.rareskills.io/post/erc-3448-metaproxy-clone#:~:text=The%20MetaProxy%20standard%20is%20also,can%20have%20an%20arbitrary%20length.))
 
-> 109. If a try catch makes a call to a contract that does not revert, but a revert happens inside the try block, what happens?
+> 112. If a try catch makes a call to a contract that does not revert, but a revert happens inside the try block, what happens?
 
 If a try/catch makes a call to an external contract that doesn't revert, but a revert happens inside of the `try` block, the transaction will still revert, because the execution continues to the `try` block if the external call was successful. This will cause an exception in the current contract and will cause the transaction to revert. (Sources: [one](https://docs.soliditylang.org/en/v0.8.26/control-structures.html#try-catch) | Example txn on Polygon Amoy [here](https://amoy.polygonscan.com/tx/0x5354809a4edc5932e8be1140a66705a8522a1e56428db07a9ba7ff7cf22dbf91))
 
-> 110. If a user calls a proxy makes a delegatecall to A, and A makes a regular call to B, from A's perspective, who is msg.sender? from B's perspective, who is msg.sender? From the proxy's perspective, who is msg.sender?
+> 113. If a user calls a proxy makes a delegatecall to A, and A makes a regular call to B, from A's perspective, who is `msg.sender`? from B's perspective, who is `msg.sender`? From the proxy's perspective, who is `msg.sender`?
 
 From the proxy's perspective, `msg.sender` is the user.
 
@@ -561,47 +572,77 @@ From `B`'s perspective, `msg.sender` is the proxy.
 
 (Sources: [one](https://ethereum.stackexchange.com/questions/123704/chain-of-delegatecall-and-call) | Example [txn](https://dashboard.tenderly.co/tx/polygon-amoy/0x4fcd3d7ff791246e0c2f88741bd9f466d5afcd5367f5c39e8db500b5f49beab6?trace=0.1.1.0))
 
-> 111. Under what circumstances do vanity addresses (leading zero addresses) save gas?
+> 114. Under what circumstances do vanity addresses (leading zero addresses) save gas?
 
 When addresses are passed as function parameters, it saves more gas if they have leading zeros as the call data will have more zeros. Additionally, if the address needs to be stored, if you were to have two addresses with at least 4 bytes of leading zeros, they could both be stored into the same storaga slot, as each would only require 16 bytes.(Sources: [one](https://www.rareskills.io/post/gas-optimization#viewer-f970n), [two](https://medium.com/coinmonks/on-efficient-ethereum-addresses-3fef0596e263))
 
-> 112. Why do a significant number of contract bytecodes begin with 6080604052? What does that bytecode sequence do?
+> 115. Why do a significant number of contract bytecodes begin with 6080604052? What does that bytecode sequence do?
 
 These 5 bytes, `6080604052` represent the initialization of the “free memory pointer”. The free memory pointer is simply a pointer to the location where free memory starts. It ensures smart contracts keep track of which memory locations have been written to and which haven’t. This protects against a contract overwriting some memory that has been allocated to another variable.([Source](https://noxx.substack.com/i/49480285/free-memory-pointer))
 
-> 113. How does Uniswap V3 determine the boundaries of liquidity intervals?
+> 116. How does Uniswap V3 determine the boundaries of liquidity intervals?
 
 Uniswap V3 introduced the concept of "concentrated liquidity" to their protocol. With this, each token pair's pool can have its liquidity allocated within custom price ranges. Prior in V2, all liquidity was distributed all along the price curve between zero and infinity. 
 
 How UniswapV3 determines the boundaries of these liquidity intervals is the usage of "ticks". Ticks are the boundaries between discrete areas in price space. Ticks are spaced such that an increase or decrease of 1 tick represents a 0.01% increase or decrease in price at any point in price space. (Sources: [one](https://docs.uniswap.org/concepts/protocol/concentrated-liquidity))
 
-> 114. What is the risk-free rate?
+> 117. What is the risk-free rate?
 
 The risk-free rate represents the interest an investor would expect from an absolutely risk-free investment over a specified period of time. (Sources: [one](https://www.investopedia.com/terms/r/risk-freerate.asp))
 
-> 115. When a contract calls another call via call, delegatecall, or staticcall, how is information passed between them?
+> 118. When a contract calls another call via call, delegatecall, or staticcall, how is information passed between them?
 
 When a contract calls another via the `CALL`, `DELEGATECALL`, and `STATICCALL` opcodes, the information is passed to the callee as ABI encoded, which would include the called function's selector along with the arguments. Additionally, because these are low-level ways of calling contracts, you would need check the returned `bool` to know the status of the execution, and would need to decode the returned payload.  (Sources: [one](https://www.rareskills.io/post/low-level-call-solidity), [two](https://docs.soliditylang.org/en/v0.8.26/units-and-global-variables.html#abi-encoding-and-decoding-functions), [three](https://docs.soliditylang.org/en/v0.8.26/units-and-global-variables.html#members-of-address-types))
+
+> 119. What is the difference between `bytes` and `bytes1[]`?
+
+TODO
+
+> 120. What is the most amount of leverage that can be achieved in a borrow-swap-supply-collateral loop if the LTV is 75%? What about other LTV limites?
+
+TODO
+
+> 121. How does Curve StableSwap achieve concentrated liquidity?
+
+TODO
+
+> 122. What quirks does the Tether stablecoin have?
+
+TODO
+
+> 123. What is the smallest uint that will store 1 million? 1 billion? 1 trillion? 1 quadrillion?
+
+TODO
+
+> 124. What danger do uninitialized UUPS logic contracts pose?
+
+TODO
+
+> 125. What is the difference (if any) between what a contract returns if a divide-by-zero happens in Solidity or if a divide-by-zero happens in Yul?
+
+TODO
+
+> 126. Why can't `.push()` be used to append to an array in memory?
+
+TODO
+
 
 
 ## Advanced
 
 
-> 116. What addresses do the ethereum precompiles live at?
+> 127. What addresses do the ethereum precompiles live at?
 
 The precompiled contracts are at addresses `0x01` through `0x0a`. It is worth noting that different EVM-compatible chains may use a different set of precompile addresses. Additionally, new precompile addresses can be added to Ethereum, but you could expect them to be range of `0x01` and `0xffff`. 
 
 Sources:
 - Solidity docs - [_Precompiled Contracts_](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#precompiled-contracts)
 
-> 117. How does Solidity manage the function selectors when there are more than 4 functions?
+> 128. Describe what "liquidity" is in the context of UniswapV2 and UniswapV3.
 
-The EVM manages function selectors when there are four or less by linear search. The EVM when looking for the function selector uses a jump table, searching for the called function. The function selectors are search in order of their hexadecimal value. However, this changes if there are more than four functions, as the EVM will instead use binary search to find the correct called function by its function selector.
+TODO
 
-Sources:
-- RareSkills - [_Understanding the Function Selector in Solidity_](https://www.rareskills.io/post/gas-optimization#viewer-248d5)
-
-> 118. If a delegatecall is made to a contract that makes a delegatecall to another contract, who is msg.sender in the proxy, the first contract, and the second contract?
+> 129. If a delegatecall is made to a contract that makes a delegatecall to another contract, who is msg.sender in the proxy, the first contract, and the second contract?
 
 In this scenario, there would be three contracts:
 
@@ -616,15 +657,7 @@ In essence, the context of the proxy would be passed to both the first _and_ sec
 Sources:
 - EVM Codes - [_DELEGATECALL_](https://www.evm.codes/#f4?fork=cancun)
 
-> 119. How does ABI encoding vary between calldata and memory, if at all?
-
-ABI encoding between `calldata` and `memory` does not vary.
-
-Sources:
-- Solidity docs - [_Contract ABI Specification_](https://docs.soliditylang.org/en/v0.8.26/abi-spec.html)
-
-
-> 120. What is the difference between how a uint64 and uint256 are abi-encoded in calldata?
+> 130. What is the difference between how a `uint64` and `uint256` are abi-encoded in calldata?
 
 The difference between how a `uint64` and `uint256` are ABI encoded is the padding used to fill 32 bytes in the calldata. Since `uint256` would naturally fit in 32 bytes, it won't require any padding with leading zeros. However, `uint64` would be padded with leading zeros for the remainder 24 bytes, since it naturally only needs 8 bytes of calldata.
 
@@ -633,7 +666,7 @@ Sources:
     - [_Layout of Call Data_](https://docs.soliditylang.org/en/v0.8.26/internals/layout_in_calldata.html)
     - [_Formal Specification of the Encoding_](https://docs.soliditylang.org/en/v0.8.26/abi-spec.html#formal-specification-of-the-encoding)
 
-> 121. What is read-only reentrancy?
+> 131. What is read-only reentrancy?
 
 Read-only reentrancy is a reentrancy scenario where a view function is reentered which in most cases is unguarded as it does not modify the contract’s state. However, if the state is inconsistent, wrong values could be reported. Other protocols relying on a return value, can be tricked into reading the wrong state to perform unwanted actions.
 
@@ -644,7 +677,7 @@ Sources:
 
 - OfficerCIA - [_Read-only Reentrancy: In-Depth_](https://officercia.mirror.xyz/DBzFiDuxmDOTQEbfXhvLdK0DXVpKu1Nkurk0Cqk3QKc)
 
-> 122. What are the security considerations of reading a (memory) bytes array from an untrusted smart contract call?
+> 132. What are the security considerations of reading a (memory) bytes array from an untrusted smart contract call?
 
 The security consideration about reading into a memory a returned bytes array from an untrusted smart contract call is that it could use a lot of gas, and thus not allowing the transaction to complete. Memory arrays use up quadratic amount of gas after 724 bytes, so a carefully chosen return data size can grief the caller.
 
@@ -654,7 +687,7 @@ Sources:
 - RareSkills - [_Smart Contract Security_](https://www.rareskills.io/post/smart-contract-security)
     - Note: Under "Gas Griefing or Denial of Service".
 
-> 123. If you deploy an empty Solidity contract, what bytecode will be present on the blockchain, if any?
+> 133. If you deploy an empty Solidity contract, what bytecode will be present on the blockchain, if any?
 
 If you were to deploy an empty Solidity contract, the bytecode that will be present on the blockchain would be the contract creation code's init code portion and the contract's metadata from the contract's runtime code.
 
@@ -670,14 +703,14 @@ Sources:
     - [_Ethereum smart contract creation code_](https://www.rareskills.io/post/ethereum-contract-creation-code)
     - [_Understanding smart contract metadata_](https://www.rareskills.io/post/solidity-metadata)
 
-> 124. How does the EVM price memory usage?
+> 134. How does the EVM price memory usage?
 
 Some EVM opcodes have the functionality of accessing memory during execution. You would have to pay for the access to memory as you access more memory offsets (32 byte slots), which is referred to as expansion. As access to memory keeps expanding, the cost to access higher memory slots grows quadratically. This discentivizes the overuse of memory.
 
 Sources:
 - evm.codes - [_Memory Expansion_](https://www.evm.codes/about#memoryexpansion)
 
-> 125. What is stored in the metadata section of a smart contract?
+> 135. What is stored in the metadata section of a smart contract?
 
 What is stored in a smart contract's metadata is the IPFS hash and the Solidity compiler version.
 
@@ -685,7 +718,7 @@ Sources:
 - RareSkills:
     - [_Understanding smart contract metadata_](https://www.rareskills.io/post/solidity-metadata)
 
-> 126. What is the uncle-block attack from an MEV perspective?
+> 136. What is the uncle-block attack from an MEV perspective?
 
 An uncle block attack from an MEV perspective is when an opportunity for MEV to occur is included in an uncle block, but not on a canonical block, and thus could still be valid.
 
@@ -697,7 +730,7 @@ Sources:
 - Alchemy - [_What are Uncle Blocks_](https://docs.alchemy.com/docs/what-are-uncle-blocks)
 - Elan Halpern (Alchemy) - [_Unmasking the Ethereum Uncle Bandit_](https://medium.com/alchemy-api/unmasking-the-ethereum-uncle-bandit-a2b3eb694019)
 
-> 127. How do you conduct a signature malleability attack?
+> 137. How do you conduct a signature malleability attack?
 
 A signature malleability attack refers to the ability of an attacker to alter a digital signature in a way that changes the signature itself without affecting the validity of the signed message.
 
@@ -712,7 +745,7 @@ Sources:
     - Note: Under "Signature Malleability".
 - ImmuneBytes - [_Signature Malleability Attacks in Blockchain_](https://www.immunebytes.com/blog/signature-malleability-attacks-in-blockchain/)
 
-> 128. Under what circumstances do addresses with leading zeros save gas and why?
+> 138. Under what circumstances do addresses with leading zeros save gas and why?
 
 Addresses with leading zeroes save gas because it saves gas cost when they are found in calldata. That is because Ethereum charges 4 gas for a zero byte of calldata and 16 gas for a non-zero byte.
 
@@ -720,7 +753,7 @@ Sources:
 - RareSkills - [_Book of Solidity Gas Optimization - 14. Heavily used functions should have optimal names_](https://www.rareskills.io/post/gas-optimization#viewer-248d5)
 - jeffreyscholz - [_solidity-zero-finder-rust_](https://github.com/jeffreyscholz/solidity-zero-finder-rust)
 
-> 129. What is the difference between payable(msg.sender).call{value: value}(””) and msg.sender.call{value: value}(””)?
+> 139. What is the difference between `payable(msg.sender).call{value: value}(””)` and `msg.sender.call{value: value}(””)`?
 
 There is no difference between `payable(msg.sender).call{value: value}(””)` and `msg.sender.call{value: value}(””)` because the usage of `.call`. `.call` is available to all addresses, regardless of whether they are `payable` or not. However, if one were attemting to use `.transfer()` or `.send()` on an `address` type, then that `address` _has_ to be `payable(address)`.
 
@@ -729,14 +762,14 @@ Sources:
     - [_Members of Address Types_](https://docs.soliditylang.org/en/v0.8.25/units-and-global-variables.html#members-of-address-types)
     - [_Address_](https://docs.soliditylang.org/en/v0.8.25/types.html#address)
 
-> 130. How many storage slots does a string take up?
+> 140. How many storage slots does a string take up?
 
 The encoding is similar to `bytes1[]`, in the sense that there is a slot for the array itself and a data area that is computed using a `keccak256` hash of that slot’s position. However, for short values (shorter than 32 bytes) the array elements are stored together with the length in the same slot.
 
 Sources:
 - Solidity docs - [_bytes and string_](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html#bytes-and-string)
 
-> 131. How does the --via-ir functionality in the Solidity compiler work?
+> 141. How does the `--via-ir` functionality in the Solidity compiler work?
 
 Solidity can generate EVM bytecode in two different ways: Either directly from Solidity to EVM opcodes (“old codegen”) or through an intermediate representation (“IR”) in Yul (“new codegen” or “IR-based codegen”).
 
@@ -745,14 +778,14 @@ The IR-based code generator was introduced with an aim to not only allow code ge
 Sources:
 - Solidity docs - [_Solidity IR-based Codegen Changes_](https://docs.soliditylang.org/en/v0.8.26/ir-breaking-changes.html)
 
-> 132. Are function modifiers called from right to left or left to right, or is it non-deterministic?
+> 142. Are function modifiers called from right to left or left to right, or is it non-deterministic?
 
 Modifiers are applied to a function by specifying them in a whitespace-separated list and are evaluated in the order presented, i.e. left to right.
 
 Sources:
 - Solidity docs - [_Function Modifiers_](https://docs.soliditylang.org/en/v0.8.26/contracts.html#function-modifiers)
 
-> 133. If you do a delegatecall to a contract and the opcode CODESIZE executes, which contract size will be returned?
+> 143. If you do a delegatecall to a contract and the opcode CODESIZE executes, which contract size will be returned?
 
 If you `DELEGATECALL` a contract and the opcode `CODESIZE` executes, the size of the calling contracts will be returned because `CODESIZE` returns the size of current context, which with `DELEGATECALL` remains being the calling contract.
 
@@ -761,7 +794,7 @@ Sources:
     - [_CODESIZE_](https://www.evm.codes/#38?fork=cancun)
     - [_DELEGATECALL_](https://www.evm.codes/#f4?fork=cancun)
 
-> 134. Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
+> 144. Why is it important to ECDSA sign a hash rather than an arbitrary bytes32?
 
 It is important to ECDSA sign a hash rather than an arbitrary `bytes32` because it is possible to craft signatures that recover to arbitrary addresses for non-hashed data. Hashing them also confirms that it is the correct length, to increase security. 
 
@@ -769,7 +802,7 @@ Sources:
 - OpenZeppelin - [_ECDSA_](https://docs.openzeppelin.com/contracts/4.x/api/utils#ECDSA)
     - [Github](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.9.5/contracts/utils/cryptography/ECDSA.sol#L43-L47)
 
-> 135. Describe how symbolic manipulation testing works.
+> 145. Describe how symbolic manipulation testing works.
 
 Symbolic execution is a program analysis technique which explores multiple execution paths at the same time. If a program is run concretely, i.e., on a specific concrete input, a single control flow path of this program is explored—that is what happens during the execution of a unit test.
 
@@ -779,21 +812,21 @@ Sources:
 - SaferMaker - [_Everything You Wanted to Know About Symbolic Execution for Ethereum Smart Contracts (But Were Afraid to Ask)_](https://hackmd.io/@SaferMaker/EVM-Sym-Exec)
 - Olympix - [_Unveiling Hidden Threats: Symbolic Execution for Smart Contract Security_](https://olympixai.medium.com/unveiling-hidden-threats-symbolic-execution-for-smart-contract-security-a6a7dffcb448)
 
-> 136. What is the most efficient way to copy regions of memory?
+> 146. What is the most efficient way to copy regions of memory?
 
 The most efficient way to copy regions of memory is with the opcode added in the Dencun Ethereum update: `MCOPY`. The purpose of MCOPY is to improve the performance of memory copying and assist in a more efficient means of building data structures. Previously, if a developer needs to copy memory their best option is to reference both MSTORE and MLOAD.
 
 Sources:
 - ConsenSys - [_Ethereum Evolved: Dencun Upgrade Part 1, EIP-5656 & EIP-6780_](Ethereum Evolved: Dencun Upgrade Part 1, EIP-5656 & EIP-6780)
 
-> 137. How can you validate on-chain that another smart contract emitted an event, without using an oracle?
+> 147. How can you validate on-chain that another smart contract emitted an event, without using an oracle?
 
 You are unable to validate on-chain that another smart contract emitted an event without an oracle because you can also listen to these event emissions through the RPC interface of an Ethereum client. Per the Solidity docs, "The [event] Log and its event data is not accessible from within contracts (not even from the contract that created them)".
 
 Sources:
 - Solidity docs - [_Events_](https://docs.soliditylang.org/en/v0.8.26/contracts.html#events)
 
-> 138. When selfdestruct is called, at what point is the Ether transferred? At what point is the smart contract's bytecode erased?
+> 148. When selfdestruct is called, at what point is the Ether transferred? At what point is the smart contract's bytecode erased?
 
 From the Cancun updrade and forward, `SELFDESTRUCT` will no longer erase a a contract's bytecode, it will only send the Ether to the target contract. Prior to the Cancun upgrade, the Ether is transferred first before the smart contract's bytecode is erased.
 
@@ -802,7 +835,7 @@ However, if `SELFDESTRUCT` occurs in the contract's creation transactio, its fun
 Sources:
 - Solidity docs - [_Deactivate and Self-destruct_](https://docs.soliditylang.org/en/v0.8.26/introduction-to-smart-contracts.html#deactivate-and-self-destruct)
 
-> 139. Under what conditions does the Openzeppelin Proxy.sol overwrite the free memory pointer? Why is it safe to do this?
+> 149. Under what conditions does the Openzeppelin Proxy.sol overwrite the free memory pointer? Why is it safe to do this?
 
 The conditions under which OpenZeppelin's `Proxy.sol` overwrites the free memory point is that the execution of `DELEGATECALL` to the implemention contract won't have further Solidity code executing in the proxy contract, as noted by their [comment](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/Proxy.sol#L24-L26) in the code. This is why it is safe to do so.
 
@@ -811,14 +844,14 @@ Sources:
     - [_Proxy Patterns_](https://blog.openzeppelin.com/proxy-patterns)
     - [_Proxy Upgrade Pattern_](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies#proxy-forwarding)
 
-> 140. Why did Solidity deprecate the "years" keyword?
+> 150. Why did Solidity deprecate the "years" keyword?
 
 The unit denomination `years` was disallowed due to complications and confusion about leap years.
 
 Sources:
 - Solidity docs - [_Literals and Suffixes_](https://docs.soliditylang.org/en/v0.8.26/050-breaking-changes.html#literals-and-suffixes)
 
-> 141. What does the verbatim keyword do, and where can it be used?
+> 151. What does the verbatim keyword do, and where can it be used?
 
 The set of `verbatim...` builtin functions lets you create bytecode for opcodes that are not known to the Yul compiler. It also allows you to create bytecode sequences that will not be modified by the optimizer.
 
@@ -838,7 +871,7 @@ It will multiply by two because the opcode `60` (`PUSH1`) will push the byte of 
 Sources:
 - Solidity docs - [_verbatim_](https://docs.soliditylang.org/en/v0.8.26/yul.html#verbatim)
 
-> 142. How much gas can be forwarded in a call to another smart contract?
+> 152. How much gas can be forwarded in a call to another smart contract?
 
 The amount of gas that can be forwarded in a call to another smart contract is 63/64. This was introduced in EIP-150 to prevent the execution of a _Call Depth Attack_, which is when, prior to the 63/64 limit, contract could increase the stack depth until 1023, then execute the intended call, which would silently error out since the stack was too deep. With the introduction of the 63/64 gas forward limit, increasing the stack with a similar attempt would have the remaining gas avaialable decrease signficantly.
 
@@ -846,7 +879,7 @@ Sources:
 - Solidity docs - [_Message Calls_](https://docs.soliditylang.org/en/v0.8.25/introduction-to-smart-contracts.html#message-calls)
 - RareSkills - [_EIP-150 and the 63/64 Rule for Gas_](https://www.rareskills.io/post/eip-150-and-the-63-64-rule-for-gas)
 
-> 143. What does an int256 variable that stores -1 look like in hex?
+> 153. What does an int256 variable that stores -1 look like in hex?
 
 An `int256` that stores `-1` in hex would look like `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`. Because solidity stores number using two's complement, when wanting to get the two's complement of a number, you invert the bits and add one to the result. Since `1` would be `0x0000000000000000000000000000000000000000000000000000000000000001`, you would invert the bits, when written in binary, and add one, giving you `0xFFFF...FFFF`.
 
@@ -857,7 +890,7 @@ Sources:
 - RareSkills - [_Solidity Signed Integer_](https://www.rareskills.io/post/signed-int-solidity)
 - Cornell - [_Two's Complement_](https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html)
 
-> 144. What is the use of the signextend opcode?
+> 154. What is the use of the signextend opcode?
 
 A signed integer smaller than 256 bits will have leading zeros. However, Two’s Complement negative numbers always start with the leftmost bit at `1`. Therefore, if a Two’s Complement integer is upcasted to a larger type, the value will change from negative to positive since the leftmost bits will be `0`. `SIGNEXTEND` handles this transition seamlessly.
 
@@ -865,7 +898,7 @@ Sources:
 - EVM Codes - [_SIGNEXTEND_](https://www.evm.codes/#0b?fork=cancun)
 - Cornell - [_Two's Complement_](https://www.cs.cornell.edu/~tomf/notes/cps104/twoscomp.html)
 
-> 145. Why do negative numbers in calldata cost more gas?
+> 155. Why do negative numbers in calldata cost more gas?
 
 Negative numbers cost more gas in the calldata because of Two's Complement, they are represented in bits as the inverse of `0`s. That's because 
 Ethereum charges 4 gas for a zero byte of calldata and 16 gas for a non-zero byte.
@@ -874,10 +907,82 @@ Sources:
 - RareSkills - [_The RareSkills Book of Solidity Gas Optimization: 80+ Tips_](https://www.rareskills.io/post/gas-optimization)
     - Note: Under "Use vanity addresses (safely!)"
 
-> 146. What is a zk-friendly hash function and how does it differ from a non-zk-friendly hash function?
+> 156. What is a zk-friendly hash function and how does it differ from a non-zk-friendly hash function?
 
 TODO
 
-> 147. What is a nullifier in the context of zero knowledge, and what is it used for?
+> 157. What does a metaproxy do?
 
 TODO
+
+> 158. What is a nullifier in the context of zero knowledge, and what is it used for?
+
+TODO
+
+> 159. What is SECP256K1?
+
+TODO
+
+> 160. Why shouldn't you get price from `slot0` in UniswapV3?
+
+TODO
+
+> 161. Describe how to compute the 9th root of a number on-chain in Solidity.
+
+TODO
+
+> 162. What is the danger of using return in assembly out of a Solidity function that has a modifier?
+
+TODO
+
+> 163. Without using the `%` operator, how can you determine if a number is even or odd?
+
+TODO
+
+> 164. What does `codesize()` return if called within the constructor? What about outside the constructor?
+
+TODO
+
+
+
+## Deprecated
+Questions that have been removed or altered from the original 140 questions. This is my way of archiving them.
+
+> 1. Prior to EIP-1559, how do you calculate the dollar cost of an Ethereum transaction?
+
+EVM opcodes cost gas to execute, and to execute a transaction on-chain, a user would have to pay for all of the individual opcodes that would be executed in their transaction. The sum of all the gas required by the opcodes would be have a use has to pay in gas. To find the dollar cost of a transaction, you would then multiply that amount of gas fees by the price of ETH at the time of execution. ([Source](https://www.blocknative.com/blog/eth-gas-101))
+
+> 2. As of the Shanghai upgrade, what is the gas limit per block?
+
+As of the Shanghai upgrade, and today 18 November 2023, the block gas limit is ~30 million. ([Source](https://etherscan.io/chart/gaslimit))
+
+> 3. How do you write a gas-efficient for loop in Solidity?
+
+Some examples of how to write a more gas-efficient `for` loop are:
+- Cache the length of the array
+- increment the iterator (e.g. `i`) by using `++i`
+- If using solidity prior to [0.8.22](https://soliditylang.org/blog/2023/10/25/solidity-0.8.22-release-announcement/), you could wrap the act of incrementing the iterator in `unchecked { ... }`
+
+([Source](https://solidity-by-example.org/gas-golf/))
+
+> 4. What is gas griefing?
+
+Gas griefing is when a contract that makes an external call to another contract does not check the return state of the externally called contract. Thus, an exploiter could submit transactions that do not provide sufficient gas for the external contract call. Then, since the return is not checked, the called contract does not know the external called did not actually compute. ([Source](https://scsfg.io/hackers/griefing/))
+
+> 5. How many arguments can a solidity function have?
+
+The EVM is a stack based machine that can only access the top 16 items, theoretically making it so that if you were to make a function with 17 or more parameters, you would get a stack too deep error. ([Source](https://docs.soliditylang.org/en/latest/introduction-to-smart-contracts.html#storage-memory-and-the-stack))
+
+> 6. How does Solidity manage the function selectors when there are more than 4 functions?
+
+The EVM manages function selectors when there are four or less by linear search. The EVM when looking for the function selector uses a jump table, searching for the called function. The function selectors are search in order of their hexadecimal value. However, this changes if there are more than four functions, as the EVM will instead use binary search to find the correct called function by its function selector.
+
+Sources:
+- RareSkills - [_Understanding the Function Selector in Solidity_](https://www.rareskills.io/post/gas-optimization#viewer-248d5)
+
+> 7. How does ABI encoding vary between calldata and memory, if at all?
+
+ABI encoding between `calldata` and `memory` does not vary.
+
+Sources:
+- Solidity docs - [_Contract ABI Specification_](https://docs.soliditylang.org/en/v0.8.26/abi-spec.html)
